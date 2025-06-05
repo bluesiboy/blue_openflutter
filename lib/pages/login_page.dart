@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:blue_openflutter/controls/verification_code_input.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -15,9 +16,7 @@ class _LoginPageState extends State<LoginPage> {
   Timer? _timer;
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _verificationCodeController = TextEditingController();
-  final List<FocusNode> _verificationFocusNodes = List.generate(6, (_) => FocusNode());
-  final List<TextEditingController> _verificationControllers = List.generate(6, (_) => TextEditingController());
+  late final VerificationCodeController _verificationCodeController;
   String _selectedCountryCode = '+86';
   bool _isPhoneValid = false;
 
@@ -25,6 +24,12 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _phoneController.addListener(_validatePhone);
+    _verificationCodeController = VerificationCodeController(
+      length: 6,
+      onCodeChanged: (code) {
+        setState(() {});
+      },
+    );
   }
 
   void _validatePhone() {
@@ -40,12 +45,6 @@ class _LoginPageState extends State<LoginPage> {
     _phoneController.dispose();
     _passwordController.dispose();
     _verificationCodeController.dispose();
-    for (var node in _verificationFocusNodes) {
-      node.dispose();
-    }
-    for (var controller in _verificationControllers) {
-      controller.dispose();
-    }
     super.dispose();
   }
 
@@ -114,7 +113,10 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ] else ...[
-                  _buildVerificationCodeInput(theme),
+                  VerificationCodeInput(
+                    controller: _verificationCodeController,
+                    length: 6,
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -342,93 +344,19 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildVerificationCodeInput(ThemeData theme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(6, (index) {
-          return Container(
-            width: 36,
-            height: 48,
-            decoration: BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: _verificationControllers[index].text.isEmpty
-                      ? theme.colorScheme.outline.withAlpha(51)
-                      : theme.colorScheme.primary,
-                  width: 2,
-                ),
-              ),
-            ),
-            child: RawKeyboardListener(
-              focusNode: FocusNode(),
-              onKey: (RawKeyEvent event) {
-                if (event is RawKeyDownEvent &&
-                    event.logicalKey == LogicalKeyboardKey.backspace &&
-                    _verificationControllers[index].text.isEmpty &&
-                    index > 0) {
-                  _verificationFocusNodes[index - 1].requestFocus();
-                  _verificationControllers[index - 1].clear();
-                  // 更新验证码
-                  String code = '';
-                  for (var controller in _verificationControllers) {
-                    code += controller.text;
-                  }
-                  _verificationCodeController.text = code;
-                  setState(() {});
-                }
-              },
-              child: TextField(
-                controller: _verificationControllers[index],
-                focusNode: _verificationFocusNodes[index],
-                keyboardType: TextInputType.number,
-                textAlign: TextAlign.center,
-                maxLength: 1,
-                style: theme.textTheme.titleLarge,
-                decoration: const InputDecoration(
-                  counterText: '',
-                  border: InputBorder.none,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                onTap: () {
-                  // 找到第一个空的输入框
-                  int firstEmptyIndex = 0;
-                  for (int i = 0; i < _verificationControllers.length; i++) {
-                    if (_verificationControllers[i].text.isEmpty) {
-                      firstEmptyIndex = i;
-                      break;
-                    }
-                  }
-                  _verificationFocusNodes[firstEmptyIndex].requestFocus();
-                },
-                onChanged: (value) {
-                  if (value.isNotEmpty && index < 5) {
-                    _verificationFocusNodes[index + 1].requestFocus();
-                  }
-                  // 更新验证码
-                  String code = '';
-                  for (var controller in _verificationControllers) {
-                    code += controller.text;
-                  }
-                  _verificationCodeController.text = code;
-                  setState(() {}); // 触发重绘以更新下划线颜色
-                },
-                onEditingComplete: () {
-                  if (index < 5) {
-                    _verificationFocusNodes[index + 1].requestFocus();
-                  }
-                },
-                onSubmitted: (value) {
-                  if (index < 5) {
-                    _verificationFocusNodes[index + 1].requestFocus();
-                  }
-                },
-              ),
-            ),
-          );
-        }),
+  Widget _buildLoginModeSwitch(ThemeData theme) {
+    return TextButton(
+      onPressed: () {
+        setState(() {
+          _isPasswordLogin = !_isPasswordLogin;
+        });
+      },
+      child: Text(
+        _isPasswordLogin ? '使用验证码登录' : '使用密码登录',
+        style: TextStyle(
+          color: theme.colorScheme.primary,
+          fontSize: 14,
+        ),
       ),
     );
   }
@@ -455,23 +383,6 @@ class _LoginPageState extends State<LoginPage> {
             fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoginModeSwitch(ThemeData theme) {
-    return TextButton(
-      onPressed: () {
-        setState(() {
-          _isPasswordLogin = !_isPasswordLogin;
-        });
-      },
-      child: Text(
-        _isPasswordLogin ? '使用验证码登录' : '使用密码登录',
-        style: TextStyle(
-          color: theme.colorScheme.primary,
-          fontSize: 14,
         ),
       ),
     );
