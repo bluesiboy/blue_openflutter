@@ -1,0 +1,58 @@
+buildscript {
+    // ext.kotlin_version = '1.9.10' // 或你项目中已有的 Kotlin 版本
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.buildDir = "../build"
+subprojects {
+    afterEvaluate { project ->
+        if (project.plugins.hasPlugin("com.android.application") ||
+                project.plugins.hasPlugin("com.android.library")) {
+            project.android {
+                compileSdkVersion 34
+                buildToolsVersion "34.0.0"
+            }
+        }
+    }
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty('android')) {
+            project.android {
+                if (namespace == null) {
+                    namespace project.group
+                }
+            }
+        }
+    }
+    afterEvaluate { subproject ->
+        // if (subproject.plugins.hasPlugin("org.jetbrains.kotlin.android") || subproject.plugins.hasPlugin("kotlin-android")) {
+        //     subproject.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+        //         kotlinOptions {
+        //             jvmTarget = "17"
+        //         }
+        //     }
+        // }
+
+        // if (subproject.hasProperty("android")) {
+        //     subproject.android {
+        //         compileOptions {
+        //             sourceCompatibility = JavaVersion.VERSION_17
+        //             targetCompatibility = JavaVersion.VERSION_17
+        //         }
+        //     }
+        // }
+    }
+    project.evaluationDependsOn(":app")
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
