@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import '../models/theme_style_config.dart';
 
 class ThemeStyleProvider extends ChangeNotifier {
-  ThemeStyleConfig _config;
+  final ThemeStyleConfig _config;
 
   ThemeStyleProvider(this._config);
 

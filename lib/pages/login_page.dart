@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:blue_openflutter/controls/verification_code_input.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -78,7 +79,65 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 48),
+                const SizedBox(height: 24),
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: PopupMenuButton<AdaptiveThemeMode>(
+                    icon: Icon(
+                      AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
+                          ? Icons.light_mode
+                          : AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark
+                              ? Icons.dark_mode
+                              : Icons.brightness_auto,
+                    ),
+                    onSelected: (AdaptiveThemeMode mode) {
+                      switch (mode) {
+                        case AdaptiveThemeMode.light:
+                          AdaptiveTheme.of(context).setLight();
+                          break;
+                        case AdaptiveThemeMode.dark:
+                          AdaptiveTheme.of(context).setDark();
+                          break;
+                        case AdaptiveThemeMode.system:
+                          AdaptiveTheme.of(context).setSystem();
+                          break;
+                      }
+                    },
+                    itemBuilder: (BuildContext context) => const [
+                      PopupMenuItem<AdaptiveThemeMode>(
+                        value: AdaptiveThemeMode.light,
+                        child: Row(
+                          children: [
+                            Icon(Icons.light_mode, size: 20),
+                            SizedBox(width: 8),
+                            Text('浅色模式'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<AdaptiveThemeMode>(
+                        value: AdaptiveThemeMode.dark,
+                        child: Row(
+                          children: [
+                            Icon(Icons.dark_mode, size: 20),
+                            SizedBox(width: 8),
+                            Text('深色模式'),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem<AdaptiveThemeMode>(
+                        value: AdaptiveThemeMode.system,
+                        child: Row(
+                          children: [
+                            Icon(Icons.brightness_auto, size: 20),
+                            SizedBox(width: 8),
+                            Text('跟随系统'),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 24),
                 Text(
                   '欢迎回来',
                   style: theme.textTheme.headlineMedium?.copyWith(
@@ -256,7 +315,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  style: theme.textTheme.titleMedium?.copyWith(
+                  style: theme.textTheme.titleLarge?.copyWith(
                     letterSpacing: 1.2,
                   ),
                   decoration: InputDecoration(
