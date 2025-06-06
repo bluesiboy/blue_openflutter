@@ -1,8 +1,11 @@
+import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:blue_openflutter/controls/verification_code_input.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -25,12 +28,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
     _phoneController.addListener(_validatePhone);
-    _verificationCodeController = VerificationCodeController(
-      length: 6,
-      onCodeChanged: (code) {
-        setState(() {});
-      },
-    );
+    _verificationCodeController = VerificationCodeController(length: 6);
   }
 
   void _validatePhone() {
@@ -80,64 +78,8 @@ class _LoginPageState extends State<LoginPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const SizedBox(height: 24),
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: PopupMenuButton<AdaptiveThemeMode>(
-                    icon: Icon(
-                      AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
-                          ? Icons.light_mode
-                          : AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark
-                              ? Icons.dark_mode
-                              : Icons.brightness_auto,
-                    ),
-                    onSelected: (AdaptiveThemeMode mode) {
-                      switch (mode) {
-                        case AdaptiveThemeMode.light:
-                          AdaptiveTheme.of(context).setLight();
-                          break;
-                        case AdaptiveThemeMode.dark:
-                          AdaptiveTheme.of(context).setDark();
-                          break;
-                        case AdaptiveThemeMode.system:
-                          AdaptiveTheme.of(context).setSystem();
-                          break;
-                      }
-                    },
-                    itemBuilder: (BuildContext context) => const [
-                      PopupMenuItem<AdaptiveThemeMode>(
-                        value: AdaptiveThemeMode.light,
-                        child: Row(
-                          children: [
-                            Icon(Icons.light_mode, size: 20),
-                            SizedBox(width: 8),
-                            Text('浅色模式'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem<AdaptiveThemeMode>(
-                        value: AdaptiveThemeMode.dark,
-                        child: Row(
-                          children: [
-                            Icon(Icons.dark_mode, size: 20),
-                            SizedBox(width: 8),
-                            Text('深色模式'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem<AdaptiveThemeMode>(
-                        value: AdaptiveThemeMode.system,
-                        child: Row(
-                          children: [
-                            Icon(Icons.brightness_auto, size: 20),
-                            SizedBox(width: 8),
-                            Text('跟随系统'),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 24),
+                _buildThemeAction(context),
+                const SizedBox(height: 48),
                 Text(
                   '欢迎回来',
                   style: theme.textTheme.headlineMedium?.copyWith(
@@ -172,10 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                 ] else ...[
-                  VerificationCodeInput(
-                    controller: _verificationCodeController,
-                    length: 6,
-                  ),
+                  VerificationCodeInput(controller: _verificationCodeController),
                   const SizedBox(height: 16),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
@@ -209,6 +148,66 @@ class _LoginPageState extends State<LoginPage> {
             ),
           ),
         ),
+      ),
+    );
+  }
+
+  Container _buildThemeAction(BuildContext context) {
+    return Container(
+      alignment: Alignment.centerRight,
+      child: PopupMenuButton<AdaptiveThemeMode>(
+        icon: Icon(
+          AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
+              ? Icons.light_mode
+              : AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark
+                  ? Icons.dark_mode
+                  : Icons.brightness_auto,
+        ),
+        onSelected: (AdaptiveThemeMode mode) {
+          switch (mode) {
+            case AdaptiveThemeMode.light:
+              AdaptiveTheme.of(context).setLight();
+              break;
+            case AdaptiveThemeMode.dark:
+              AdaptiveTheme.of(context).setDark();
+              break;
+            case AdaptiveThemeMode.system:
+              AdaptiveTheme.of(context).setSystem();
+              break;
+          }
+        },
+        itemBuilder: (BuildContext context) => const [
+          PopupMenuItem<AdaptiveThemeMode>(
+            value: AdaptiveThemeMode.light,
+            child: Row(
+              children: [
+                Icon(Icons.light_mode, size: 20),
+                SizedBox(width: 8),
+                Text('浅色模式'),
+              ],
+            ),
+          ),
+          PopupMenuItem<AdaptiveThemeMode>(
+            value: AdaptiveThemeMode.dark,
+            child: Row(
+              children: [
+                Icon(Icons.dark_mode, size: 20),
+                SizedBox(width: 8),
+                Text('深色模式'),
+              ],
+            ),
+          ),
+          PopupMenuItem<AdaptiveThemeMode>(
+            value: AdaptiveThemeMode.system,
+            child: Row(
+              children: [
+                Icon(Icons.brightness_auto, size: 20),
+                SizedBox(width: 8),
+                Text('跟随系统'),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -315,9 +314,7 @@ class _LoginPageState extends State<LoginPage> {
                 TextField(
                   controller: _phoneController,
                   keyboardType: TextInputType.phone,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    letterSpacing: 1.2,
-                  ),
+                  style: theme.textTheme.titleMedium?.copyWith(letterSpacing: 1.2, fontSize: 18),
                   decoration: InputDecoration(
                     hintText: '请输入手机号',
                     hintStyle: theme.textTheme.titleMedium?.copyWith(
@@ -420,27 +417,33 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
+  bool _islogin = false;
   Widget _buildLoginButton(ThemeData theme) {
     return SizedBox(
       width: double.infinity,
       height: 48,
-      child: ElevatedButton(
-        onPressed: () {
-          // TODO: 实现登录功能
+      child: RoundedLoadingButton(
+        color: theme.colorScheme.primary,
+        controller: _btnController,
+        onPressed: () async {
+          setState(() {
+            _islogin = true;
+          });
+          await Future.delayed(Durations.long4);
+          setState(() {
+            _islogin = true;
+          });
+          _btnController.success();
+          await Future.delayed(Durations.medium4);
+          if (mounted) Navigator.pushReplacementNamed(context, AppRouter.home);
         },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.colorScheme.primary,
-          foregroundColor: theme.colorScheme.onPrimary,
-          elevation: 0,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: const Text(
+        child: Text(
           '登录',
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w600,
+            color: theme.colorScheme.onPrimary,
           ),
         ),
       ),

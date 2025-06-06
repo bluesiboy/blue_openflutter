@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 import 'package:flutter/services.dart';
 
 class VerificationCodeController {
   final List<TextEditingController> _controllers = [];
   final List<FocusNode> _focusNodes = [];
   final int length;
-  final Function(String) onCodeChanged;
+  final Function(String)? onCodeChanged;
 
   VerificationCodeController({
     required this.length,
-    required this.onCodeChanged,
+    this.onCodeChanged,
   }) {
     _controllers.addAll(List.generate(length, (_) => TextEditingController()));
     _focusNodes.addAll(List.generate(length, (_) => FocusNode()));
@@ -57,7 +58,7 @@ class VerificationCodeController {
     for (var controller in _controllers) {
       code += controller.text;
     }
-    onCodeChanged(code);
+    if (onCodeChanged != null) onCodeChanged!(code);
   }
 
   List<TextEditingController> get controllers => _controllers;
@@ -66,7 +67,6 @@ class VerificationCodeController {
 
 class VerificationCodeInput extends StatefulWidget {
   final VerificationCodeController controller;
-  final int length;
   final double itemWidth;
   final double itemHeight;
   final double itemSpacing;
@@ -77,7 +77,6 @@ class VerificationCodeInput extends StatefulWidget {
   const VerificationCodeInput({
     super.key,
     required this.controller,
-    this.length = 6,
     this.itemWidth = 36,
     this.itemHeight = 48,
     this.itemSpacing = 8,
@@ -101,11 +100,11 @@ class _VerificationCodeInputState extends State<VerificationCodeInput> {
       padding: widget.padding ?? const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: List.generate(widget.length, (index) {
+        children: List.generate(widget.controller.length, (index) {
           return Container(
             width: widget.itemWidth,
             height: widget.itemHeight,
-            margin: EdgeInsets.only(right: index < widget.length - 1 ? widget.itemSpacing : 0),
+            margin: EdgeInsets.only(right: index < widget.controller.length - 1 ? widget.itemSpacing : 0),
             decoration: BoxDecoration(
               border: Border(
                 bottom: BorderSide(
@@ -126,6 +125,7 @@ class _VerificationCodeInputState extends State<VerificationCodeInput> {
                   widget.controller.focusNodes[index - 1].requestFocus();
                   widget.controller.controllers[index - 1].clear();
                   widget.controller._updateCode();
+                  setState(() {});
                 }
               },
               child: TextField(
@@ -145,18 +145,19 @@ class _VerificationCodeInputState extends State<VerificationCodeInput> {
                   widget.controller.focus();
                 },
                 onChanged: (value) {
-                  if (value.isNotEmpty && index < widget.length - 1) {
+                  if (value.isNotEmpty && index < widget.controller.length - 1) {
                     widget.controller.focusNodes[index + 1].requestFocus();
                   }
                   widget.controller._updateCode();
+                  setState(() {});
                 },
                 onEditingComplete: () {
-                  if (index < widget.length - 1) {
+                  if (index < widget.controller.length - 1) {
                     widget.controller.focusNodes[index + 1].requestFocus();
                   }
                 },
                 onSubmitted: (value) {
-                  if (index < widget.length - 1) {
+                  if (index < widget.controller.length - 1) {
                     widget.controller.focusNodes[index + 1].requestFocus();
                   }
                 },

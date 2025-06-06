@@ -345,6 +345,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "7.0.1"
+  package_info_plus:
+    dependency: "direct main"
+    description:
+      name: package_info_plus
+      sha256: "7976bfe4c583170d6cdc7077e3237560b364149fcd268b5f53d95a991963b191"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "8.3.0"
+  package_info_plus_platform_interface:
+    dependency: transitive
+    description:
+      name: package_info_plus_platform_interface
+      sha256: "6c935fb612dff8e3cc9632c2b301720c77450a126114126ffaafe28d2e87956c"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.2.0"
   path:
     dependency: transitive
     description:
@@ -513,6 +529,22 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "4.1.0"
+  rounded_loading_button_plus:
+    dependency: "direct main"
+    description:
+      name: rounded_loading_button_plus
+      sha256: "8baad9b66c4a81b02b597edf7691cf78f7267a999c08a68937e391af7b2da653"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.0.1"
+  rxdart:
+    dependency: transitive
+    description:
+      name: rxdart
+      sha256: "5c3004a4a8dbb94bd4bf5412a4def4acdaa12e12f269737a5751369e12d1a962"
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "0.28.0"
   shared_preferences:
     dependency: "direct main"
     description:

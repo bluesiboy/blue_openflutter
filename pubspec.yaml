@@ -56,6 +56,8 @@ dependencies:
   # install_plugin: ^2.1.0
   device_info_plus: ^11.4.0
   flutter_svg: ^2.0.9
+  package_info_plus: ^8.3.0
+  rounded_loading_button_plus: ^3.0.1
 
 dev_dependencies:
   flutter_test:

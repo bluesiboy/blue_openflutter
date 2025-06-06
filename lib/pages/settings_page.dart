@@ -22,84 +22,215 @@ class _SettingsPageState extends State<SettingsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('设置'),
-        scrolledUnderElevation: 0,
       ),
-      body: Consumer<ThemeStyleProvider>(builder: (context, themeProvider, child) {
-        var themeStyleConfig = themeProvider.config;
-        return ListView(
-          children: [
-            const SizedBox(height: 4),
-            _buildSection(
-              context,
-              title: SettingsPage.themeTitle,
-              children: [
-                _buildSubTitle(context, '外观设置'),
-                switch (themeStyleConfig.currentStyle) {
-                  ThemeStyleConfig.material => _buildMaterialThemeSelector(context),
-                  ThemeStyleConfig.ios => _buildIOSThemeSelector(context),
-                  ThemeStyleConfig.switch_ => _buildSwitchThemeSelector(context),
-                  ThemeStyleConfig.segmented => _buildSegmentedThemeSelector(context),
-                  ThemeStyleConfig.slider => _buildSliderThemeSelector(context),
-                  ThemeStyleConfig.preview => _buildPreviewThemeSelector(context),
-                  ThemeStyleConfig.card3d => _build3DThemeSelector(context),
-                  ThemeStyleConfig.animated => _buildAnimatedThemeSelector(context),
-                  ThemeStyleConfig.glass => _buildGlassThemeSelector(context),
-                  ThemeStyleConfig.neon => _buildNeonThemeSelector(context),
-                  ThemeStyleConfig.liquid => _buildLiquidThemeSelector(context),
-                  _ => const SizedBox.shrink(),
+      body: ListView(
+        children: [
+          _buildSection(
+            context,
+            title: '通用设置',
+            children: [
+              _buildThemeSetting(context),
+              _buildLanguageSetting(context),
+              _buildNotificationSetting(context),
+            ],
+          ),
+          _buildSection(
+            context,
+            title: '账号与安全',
+            children: [
+              _buildSettingItem(
+                context,
+                icon: Icons.lock_outline,
+                title: '修改密码',
+                onTap: () {
+                  // TODO: 实现修改密码功能
                 },
-                // _buildSubTitle(context, '纯黑背景'),
-                _buildSwitchTile(context,
-                    title: '纯黑背景',
-                    subTitle: '在深色模式下使用纯黑背景',
-                    value: themeStyleConfig.usePureBlack,
-                    onChanged: (value) => themeProvider.updatePureBlack(value)),
-                _buildSubTitle(context, '自定义颜色'),
-                _buildSwitchTile(
-                  context,
-                  title: '使用自定义主题色',
-                  value: themeStyleConfig.enableCustomColor,
-                  onChanged: (value) => themeProvider.updateCustomColor(value),
+              ),
+              _buildSettingItem(
+                context,
+                icon: Icons.phone_android_outlined,
+                title: '绑定手机',
+                onTap: () {
+                  // TODO: 实现绑定手机功能
+                },
+              ),
+            ],
+          ),
+          _buildSection(
+            context,
+            title: '关于',
+            children: [
+              _buildSettingItem(
+                context,
+                icon: Icons.info_outline,
+                title: '关于我们',
+                onTap: () {
+                  // TODO: 实现关于我们页面
+                },
+              ),
+              _buildSettingItem(
+                context,
+                icon: Icons.description_outlined,
+                title: '用户协议',
+                onTap: () {
+                  // TODO: 实现用户协议页面
+                },
+              ),
+              _buildSettingItem(
+                context,
+                icon: Icons.privacy_tip_outlined,
+                title: '隐私政策',
+                onTap: () {
+                  // TODO: 实现隐私政策页面
+                },
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: ElevatedButton(
+              onPressed: () {
+                // TODO: 实现退出登录功能
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: theme.colorScheme.error,
+                foregroundColor: theme.colorScheme.onError,
+              ),
+              child: const Text('退出登录'),
+            ),
+          ),
+          const SizedBox(height: 24),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSection(
+    BuildContext context, {
+    required String title,
+    required List<Widget> children,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            title,
+            style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                  color: Theme.of(context).colorScheme.primary,
                 ),
-                const SizedBox(height: 16),
-                AnimatedSize(
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.fastOutSlowIn,
-                  child: AnimatedOpacity(
-                    duration: const Duration(milliseconds: 300),
-                    opacity: themeStyleConfig.enableCustomColor ? 1.0 : 0.0,
-                    child: themeStyleConfig.enableCustomColor
-                        ? Column(
-                            children: [
-                              _buildColorPicker(
-                                context,
-                                title: '主色调',
-                                color: themeStyleConfig.customPrimaryColor,
-                                onColorChanged: (color) => themeProvider.updateCustomColors(
-                                  primaryColor: color,
-                                ),
-                              ),
-                              _buildColorPicker(
-                                context,
-                                title: '辅助色',
-                                color: themeStyleConfig.customSecondaryColor,
-                                onColorChanged: (color) => themeProvider.updateCustomColors(
-                                  secondaryColor: color,
-                                ),
-                              ),
-                            ],
-                          )
-                        : const SizedBox.shrink(),
-                  ),
-                ),
+          ),
+        ),
+        ...children,
+        const Divider(),
+      ],
+    );
+  }
+
+  Widget _buildThemeSetting(BuildContext context) {
+    return _buildSettingItem(
+      context,
+      icon: Icons.palette_outlined,
+      title: '主题设置',
+      trailing: PopupMenuButton<AdaptiveThemeMode>(
+        icon: Icon(
+          AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
+              ? Icons.light_mode
+              : AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark
+                  ? Icons.dark_mode
+                  : Icons.brightness_auto,
+        ),
+        onSelected: (AdaptiveThemeMode mode) {
+          switch (mode) {
+            case AdaptiveThemeMode.light:
+              AdaptiveTheme.of(context).setLight();
+              break;
+            case AdaptiveThemeMode.dark:
+              AdaptiveTheme.of(context).setDark();
+              break;
+            case AdaptiveThemeMode.system:
+              AdaptiveTheme.of(context).setSystem();
+              break;
+          }
+        },
+        itemBuilder: (BuildContext context) => const [
+          PopupMenuItem<AdaptiveThemeMode>(
+            value: AdaptiveThemeMode.light,
+            child: Row(
+              children: [
+                Icon(Icons.light_mode, size: 20),
+                SizedBox(width: 8),
+                Text('浅色模式'),
               ],
             ),
-          ],
-        );
-      }),
+          ),
+          PopupMenuItem<AdaptiveThemeMode>(
+            value: AdaptiveThemeMode.dark,
+            child: Row(
+              children: [
+                Icon(Icons.dark_mode, size: 20),
+                SizedBox(width: 8),
+                Text('深色模式'),
+              ],
+            ),
+          ),
+          PopupMenuItem<AdaptiveThemeMode>(
+            value: AdaptiveThemeMode.system,
+            child: Row(
+              children: [
+                Icon(Icons.brightness_auto, size: 20),
+                SizedBox(width: 8),
+                Text('跟随系统'),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLanguageSetting(BuildContext context) {
+    return _buildSettingItem(
+      context,
+      icon: Icons.language_outlined,
+      title: '语言设置',
+      trailing: const Text('简体中文'),
+      onTap: () {
+        // TODO: 实现语言设置功能
+      },
+    );
+  }
+
+  Widget _buildNotificationSetting(BuildContext context) {
+    return _buildSettingItem(
+      context,
+      icon: Icons.notifications_outlined,
+      title: '通知设置',
+      onTap: () {
+        // TODO: 实现通知设置功能
+      },
+    );
+  }
+
+  Widget _buildSettingItem(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    Widget? trailing,
+    VoidCallback? onTap,
+  }) {
+    return ListTile(
+      leading: Icon(icon),
+      title: Text(title),
+      trailing: trailing ?? const Icon(Icons.chevron_right),
+      onTap: onTap,
     );
   }
 
@@ -229,38 +360,6 @@ class _SettingsPageState extends State<SettingsPage> {
               letterSpacing: 0.5,
             ),
       ),
-    );
-  }
-
-  Widget _buildSection(BuildContext context, {required String title, required List<Widget> children}) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Text(
-            title,
-            style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                ),
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: Theme.of(context).dividerColor.withOpacity(0.2),
-              width: 0.5,
-            ),
-          ),
-          margin: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: children,
-          ),
-        ),
-      ],
     );
   }
 
