@@ -1,10 +1,15 @@
+import 'dart:io';
+
 import 'package:blue_openflutter/models/theme_style_config.dart';
 import 'package:blue_openflutter/providers/theme_style_provider.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -135,64 +140,83 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildThemeSetting(BuildContext context) {
+    var lightWidget = const Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.light_mode, size: 20),
+        SizedBox(width: 8),
+        Text('浅色模式'),
+      ],
+    );
+    var darkWidget = const Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.dark_mode, size: 20),
+        SizedBox(width: 8),
+        Text('深色模式'),
+      ],
+    );
+    var systemWidget = const Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.brightness_auto, size: 20),
+        SizedBox(width: 8),
+        Text('跟随系统'),
+      ],
+    );
+
+    Widget getCurrentThemeWidget() {
+      final currentMode = AdaptiveTheme.of(context).mode;
+      if (currentMode == AdaptiveThemeMode.light) {
+        return lightWidget;
+      } else if (currentMode == AdaptiveThemeMode.dark) {
+        return darkWidget;
+      } else {
+        return systemWidget;
+      }
+    }
+
     return _buildSettingItem(
       context,
       icon: Icons.palette_outlined,
       title: '主题设置',
-      trailing: PopupMenuButton<AdaptiveThemeMode>(
-        icon: Icon(
-          AdaptiveTheme.of(context).mode == AdaptiveThemeMode.light
-              ? Icons.light_mode
-              : AdaptiveTheme.of(context).mode == AdaptiveThemeMode.dark
-                  ? Icons.dark_mode
-                  : Icons.brightness_auto,
-        ),
-        onSelected: (AdaptiveThemeMode mode) {
-          switch (mode) {
-            case AdaptiveThemeMode.light:
-              AdaptiveTheme.of(context).setLight();
-              break;
-            case AdaptiveThemeMode.dark:
-              AdaptiveTheme.of(context).setDark();
-              break;
-            case AdaptiveThemeMode.system:
-              AdaptiveTheme.of(context).setSystem();
-              break;
-          }
-        },
-        itemBuilder: (BuildContext context) => const [
-          PopupMenuItem<AdaptiveThemeMode>(
-            value: AdaptiveThemeMode.light,
-            child: Row(
-              children: [
-                Icon(Icons.light_mode, size: 20),
-                SizedBox(width: 8),
-                Text('浅色模式'),
-              ],
-            ),
-          ),
-          PopupMenuItem<AdaptiveThemeMode>(
-            value: AdaptiveThemeMode.dark,
-            child: Row(
-              children: [
-                Icon(Icons.dark_mode, size: 20),
-                SizedBox(width: 8),
-                Text('深色模式'),
-              ],
-            ),
-          ),
-          PopupMenuItem<AdaptiveThemeMode>(
-            value: AdaptiveThemeMode.system,
-            child: Row(
-              children: [
-                Icon(Icons.brightness_auto, size: 20),
-                SizedBox(width: 8),
-                Text('跟随系统'),
-              ],
-            ),
-          ),
-        ],
-      ),
+      trailing: getCurrentThemeWidget(),
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('选择主题'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    title: lightWidget,
+                    onTap: () {
+                      AdaptiveTheme.of(context).setLight();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    title: darkWidget,
+                    onTap: () {
+                      AdaptiveTheme.of(context).setDark();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    title: systemWidget,
+                    onTap: () {
+                      AdaptiveTheme.of(context).setSystem();
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
     );
   }
 
@@ -208,13 +232,19 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
+  final mc = const MethodChannel('notification_settings');
   Widget _buildNotificationSetting(BuildContext context) {
     return _buildSettingItem(
       context,
       icon: Icons.notifications_outlined,
       title: '通知设置',
-      onTap: () {
-        // TODO: 实现通知设置功能
+      onTap: () async {
+        // 跳转到系统通知设置界面
+        try {
+          await mc.invokeMethod('openNotificationSettings');
+        } catch (e) {
+          SmartDialog.showToast('打开失败$e');
+        }
       },
     );
   }
