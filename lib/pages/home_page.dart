@@ -1,3 +1,4 @@
+import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 
@@ -96,7 +97,6 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
   late Animation<double> _animation;
   final _searchController = TextEditingController();
   bool _isSearching = false;
-  OverlayEntry? _overlayEntry;
 
   @override
   void initState() {
@@ -115,73 +115,102 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
   void dispose() {
     _animationController.dispose();
     _searchController.dispose();
-    _removeOverlay();
     super.dispose();
-  }
-
-  void _removeOverlay() {
-    _overlayEntry?.remove();
-    _overlayEntry = null;
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
+    return WillPopScope(
+      onWillPop: () async {
         if (_isSearching) {
           setState(() => _isSearching = false);
           _searchController.clear();
           FocusScope.of(context).unfocus();
+          return false;
         }
+        return true;
       },
-      child: CustomScrollView(
-        slivers: [
-          SliverAppBar(
-            floating: true,
-            pinned: true,
-            title: const Text('首页'),
-            actions: [
-              _buildSearchBox(context),
-              if (!_isSearching)
+      child: GestureDetector(
+        onTap: () {
+          if (_isSearching) {
+            setState(() => _isSearching = false);
+            _searchController.clear();
+            FocusScope.of(context).unfocus();
+          }
+        },
+        child: CustomScrollView(
+          slivers: [
+            SliverAppBar(
+              floating: true,
+              pinned: true,
+              title: const Text('首页'),
+              actions: [
+                _buildSearchBox(context),
                 IconButton(
-                  icon: const Icon(Icons.notifications_outlined),
+                  icon: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      const Icon(Icons.notifications_outlined),
+                      Positioned(
+                        right: -8,
+                        top: -8,
+                        child: Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.primary,
+                            shape: BoxShape.circle,
+                          ),
+                          child: Text(
+                            '3',
+                            style: TextStyle(
+                              color: Theme.of(context).colorScheme.onPrimary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                   onPressed: _showNotificationPanel,
                 ),
-            ],
-          ),
-          SliverToBoxAdapter(
-            child: Container(
-              height: 200,
-              color: Colors.grey[200],
-              child: const Center(
-                child: Text('轮播图区域'),
-              ),
+                const SizedBox(width: 10),
+              ],
             ),
-          ),
-          SliverPadding(
-            padding: const EdgeInsets.all(16),
-            sliver: SliverGrid(
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 1.5,
-              ),
-              delegate: SliverChildBuilderDelegate(
-                (context, index) => Container(
-                  decoration: BoxDecoration(
-                    color: Colors.grey[200],
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Center(
-                    child: Text('功能卡片 ${index + 1}'),
-                  ),
+            SliverToBoxAdapter(
+              child: Container(
+                height: 200,
+                color: Colors.grey[200],
+                child: const Center(
+                  child: Text('轮播图区域'),
                 ),
-                childCount: 4,
               ),
             ),
-          ),
-        ],
+            SliverPadding(
+              padding: const EdgeInsets.all(16),
+              sliver: SliverGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  mainAxisSpacing: 16,
+                  crossAxisSpacing: 16,
+                  childAspectRatio: 1.5,
+                ),
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) => Container(
+                    decoration: BoxDecoration(
+                      color: Colors.grey[200],
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Center(
+                      child: Text('功能卡片 ${index + 1}'),
+                    ),
+                  ),
+                  childCount: 4,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -249,59 +278,32 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
   }
 
   void _showNotificationPanel() {
-    _removeOverlay();
-
-    final RenderBox button = context.findRenderObject() as RenderBox;
-    final RenderBox overlay = Overlay.of(context).context.findRenderObject() as RenderBox;
-    final buttonPosition = button.localToGlobal(Offset.zero, ancestor: overlay);
-
-    _overlayEntry = OverlayEntry(
-      builder: (context) => GestureDetector(
-        onTap: _removeOverlay,
-        child: Container(
-          color: Colors.transparent,
-          child: Stack(
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      enableDrag: true,
+      isDismissible: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.75,
+        minChildSize: 0.5,
+        maxChildSize: 0.95,
+        builder: (context, scrollController) => Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              Positioned.fill(
-                child: GestureDetector(
-                  onTap: _removeOverlay,
-                  child: Container(
-                    color: Colors.transparent,
-                  ),
-                ),
-              ),
-              Positioned(
-                top: buttonPosition.dy + 48,
-                right: 16,
-                child: GestureDetector(
-                  onTap: () {}, // 阻止点击事件冒泡
-                  child: Material(
-                    elevation: 8,
-                    borderRadius: BorderRadius.circular(12),
-                    child: Container(
-                      width: 300,
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.surface,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildNotificationHeader(context),
-                          _buildNotificationList(context),
-                        ],
-                      ),
-                    ),
-                  ),
-                ),
+              _buildNotificationHeader(context),
+              Expanded(
+                child: _buildNotificationList(context, scrollController),
               ),
             ],
           ),
         ),
       ),
     );
-
-    Overlay.of(context).insert(_overlayEntry!);
   }
 
   Widget _buildNotificationHeader(BuildContext context) {
@@ -326,8 +328,8 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
           ),
           TextButton(
             onPressed: () {
+              Navigator.pop(context);
               // TODO: 实现查看全部功能
-              _removeOverlay();
             },
             child: Text(
               '查看全部',
@@ -342,7 +344,7 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
     );
   }
 
-  Widget _buildNotificationList(BuildContext context) {
+  Widget _buildNotificationList(BuildContext context, ScrollController scrollController) {
     final theme = Theme.of(context);
     final notifications = [
       {
@@ -366,7 +368,7 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
     ];
 
     return ListView.separated(
-      shrinkWrap: true,
+      controller: scrollController,
       padding: EdgeInsets.zero,
       itemCount: notifications.length,
       separatorBuilder: (context, index) => Divider(
@@ -416,8 +418,8 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
             ),
           ),
           onTap: () {
+            Navigator.pop(context);
             // TODO: 处理通知点击
-            _removeOverlay();
           },
         );
       },
@@ -452,8 +454,193 @@ class _ProfileTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('个人中心页面'),
+    final theme = Theme.of(context);
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          floating: true,
+          pinned: true,
+          title: const Text('个人中心'),
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.settings_outlined),
+              onPressed: () {
+                Navigator.pushNamed(context, AppRouter.settings);
+              },
+            ),
+          ],
+        ),
+        SliverToBoxAdapter(
+          child: Column(
+            children: [
+              _buildUserInfo(context),
+              const SizedBox(height: 16),
+              _buildQuickActions(context),
+              const SizedBox(height: 16),
+              _buildMenuList(context),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildUserInfo(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: theme.colorScheme.surface,
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 40,
+            backgroundColor: theme.colorScheme.primaryContainer,
+            child: Icon(
+              Icons.person,
+              size: 40,
+              color: theme.colorScheme.onPrimaryContainer,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  '用户名',
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'ID: 12345678',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: () {
+                    // TODO: 编辑个人资料
+                  },
+                  child: const Text('编辑资料'),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildQuickActions(BuildContext context) {
+    final theme = Theme.of(context);
+    final actions = <Map<String, dynamic>>[
+      {'icon': Icons.favorite_border, 'label': '收藏', 'count': '12'},
+      {'icon': Icons.history, 'label': '历史', 'count': '23'},
+      {'icon': Icons.star_border, 'label': '关注', 'count': '45'},
+      {'icon': Icons.download_outlined, 'label': '下载', 'count': '8'},
+    ];
+
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 16),
+      color: theme.colorScheme.surface,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: actions.map((action) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                action['count']!,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                action['label']!,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                ),
+              ),
+            ],
+          );
+        }).toList(),
+      ),
+    );
+  }
+
+  Widget _buildMenuList(BuildContext context) {
+    final theme = Theme.of(context);
+    final menuItems = <Map<String, dynamic>>[
+      {
+        'icon': Icons.payment_outlined,
+        'label': '我的钱包',
+        'trailing': '¥ 1,234.56',
+      },
+      {
+        'icon': Icons.card_giftcard_outlined,
+        'label': '我的订单',
+        'trailing': '查看全部订单',
+      },
+      {
+        'icon': Icons.location_on_outlined,
+        'label': '收货地址',
+        'trailing': '管理收货地址',
+      },
+      {
+        'icon': Icons.support_agent_outlined,
+        'label': '客服中心',
+        'trailing': '在线客服',
+      },
+      {
+        'icon': Icons.help_outline,
+        'label': '帮助中心',
+        'trailing': '常见问题',
+      },
+      {
+        'icon': Icons.info_outline,
+        'label': '关于我们',
+        'trailing': '版本 1.0.0',
+        'route': AppRouter.about,
+      },
+    ];
+
+    return Container(
+      color: theme.colorScheme.surface,
+      child: Column(
+        children: menuItems.map((item) {
+          return ListTile(
+            leading: Icon(
+              item['icon'] as IconData,
+              color: theme.colorScheme.primary,
+            ),
+            title: Text(item['label']!),
+            trailing: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (item['trailing'] != null)
+                  Text(
+                    item['trailing']!,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    ),
+                  ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.chevron_right,
+                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                ),
+              ],
+            ),
+            onTap: () {
+              if (item.containsKey('route')) Navigator.pushNamed(context, item['route']);
+            },
+          );
+        }).toList(),
+      ),
     );
   }
 }

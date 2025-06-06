@@ -24,7 +24,7 @@ class AppRouter {
       return MaterialPageRoute(builder: (_) => const LoginPage());
     } else if (name == home) {
       return MaterialPageRoute(builder: (_) => const HomePage());
-    } else if (name == settings) {
+    } else if (name == AppRouter.settings) {
       return MaterialPageRoute(builder: (_) => const SettingsPage());
     } else if (name == about) {
       return MaterialPageRoute(builder: (_) => const AboutPage());
