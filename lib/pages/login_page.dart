@@ -23,12 +23,13 @@ class _LoginPageState extends State<LoginPage> {
   late final VerificationCodeController _verificationCodeController;
   String _selectedCountryCode = '+86';
   bool _isPhoneValid = false;
+  bool _isCodeValid = false;
 
   @override
   void initState() {
     super.initState();
     _phoneController.addListener(_validatePhone);
-    _verificationCodeController = VerificationCodeController(length: 6);
+    _verificationCodeController = VerificationCodeController(length: 6, onCodeChanged: _validateCode);
   }
 
   void _validatePhone() {
@@ -36,6 +37,13 @@ class _LoginPageState extends State<LoginPage> {
     setState(() {
       _isPhoneValid = phone.length == 11;
     });
+  }
+
+  void _validateCode(String code) {
+    setState(() {
+      _isCodeValid = code.length == _verificationCodeController.length;
+    });
+    print(code.length);
   }
 
   @override
@@ -426,18 +434,20 @@ class _LoginPageState extends State<LoginPage> {
       child: RoundedLoadingButton(
         color: theme.colorScheme.primary,
         controller: _btnController,
-        onPressed: () async {
-          setState(() {
-            _islogin = true;
-          });
-          await Future.delayed(Durations.long4);
-          setState(() {
-            _islogin = true;
-          });
-          _btnController.success();
-          await Future.delayed(Durations.medium4);
-          if (mounted) Navigator.pushReplacementNamed(context, AppRouter.home);
-        },
+        onPressed: !(_isCodeValid || _isPhoneValid)
+            ? null
+            : () async {
+                setState(() {
+                  _islogin = true;
+                });
+                await Future.delayed(Durations.long4);
+                setState(() {
+                  _islogin = true;
+                });
+                _btnController.success();
+                await Future.delayed(Durations.medium4);
+                if (mounted) Navigator.pushReplacementNamed(context, AppRouter.home);
+              },
         child: Text(
           '登录',
           style: TextStyle(
