@@ -228,6 +228,36 @@ class _SettingsPageState extends State<SettingsPage> {
       trailing: const Text('简体中文'),
       onTap: () {
         // TODO: 实现语言设置功能
+        // 弹窗选择语言
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('选择语言'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  ListTile(
+                    title: const Text('简体中文'),
+                    onTap: () {
+                      // TODO: 实现语言切换逻辑
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  ListTile(
+                    title: const Text('English'),
+                    trailing: const Text('暂不支持'),
+                    onTap: () {
+                      // TODO: 实现语言切换逻辑
+                      Navigator.of(context).pop();
+                    },
+                    enabled: false,
+                  ),
+                ],
+              ),
+            );
+          },
+        );
       },
     );
   }
