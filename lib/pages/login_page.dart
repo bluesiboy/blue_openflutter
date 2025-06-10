@@ -4,7 +4,6 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:blue_openflutter/controls/verification_code_input.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 
 class LoginPage extends StatefulWidget {
@@ -14,7 +13,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
   bool _isPasswordLogin = false;
   int _countdown = 0;
   Timer? _timer;
@@ -24,26 +23,61 @@ class _LoginPageState extends State<LoginPage> {
   String _selectedCountryCode = '+86';
   bool _isPhoneValid = false;
   bool _isCodeValid = false;
+  bool _showGlow = false;
+  int _breathCount = 0;
+
+  late final AnimationController _breathController;
+  late final Animation<double> _breathAnimation;
 
   @override
   void initState() {
     super.initState();
     _phoneController.addListener(_validatePhone);
-    _verificationCodeController = VerificationCodeController(length: 6, onCodeChanged: _validateCode);
-  }
+    _verificationCodeController = VerificationCodeController(
+      length: 6,
+      onCodeChanged: _validateCode,
+    );
 
-  void _validatePhone() {
-    final phone = _phoneController.text.replaceAll(RegExp(r'\D'), '');
-    setState(() {
-      _isPhoneValid = phone.length == 11;
-    });
-  }
+    _breathController = AnimationController(
+      duration: const Duration(seconds: 1),
+      vsync: this,
+    );
 
-  void _validateCode(String code) {
-    setState(() {
-      _isCodeValid = code.length == _verificationCodeController.length;
+    _breathAnimation = Tween<double>(begin: 0.0, end: 0.2).animate(
+      CurvedAnimation(
+        parent: _breathController,
+        curve: Curves.easeInOut,
+      ),
+    );
+
+    _breathController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        _breathCount++;
+        if (_breathCount > 2) {
+          _breathController.stop();
+          _breathCount = 0;
+          setState(() => _showGlow = false);
+        } else {
+          _breathController.reverse();
+        }
+      } else if (status == AnimationStatus.dismissed && _breathCount < 2) {
+        _breathController.forward();
+      }
     });
-    print(code.length);
+
+    _phoneController.addListener(() {
+      if (_isPhoneValid && _countdown == 0) {
+        if (!_breathController.isAnimating) {
+          _breathCount = 0;
+          setState(() => _showGlow = true);
+          _breathController.forward();
+        }
+      } else {
+        _breathController.stop();
+        _breathCount = 0;
+        setState(() => _showGlow = false);
+      }
+    });
   }
 
   @override
@@ -52,7 +86,17 @@ class _LoginPageState extends State<LoginPage> {
     _phoneController.dispose();
     _passwordController.dispose();
     _verificationCodeController.dispose();
+    _breathController.dispose();
     super.dispose();
+  }
+
+  void _validatePhone() {
+    final phone = _phoneController.text.replaceAll(RegExp(r'\D'), '');
+    setState(() => _isPhoneValid = phone.length == 11);
+  }
+
+  void _validateCode(String code) {
+    setState(() => _isCodeValid = code.length == _verificationCodeController.length);
   }
 
   void _startCountdown() {
@@ -127,20 +171,44 @@ class _LoginPageState extends State<LoginPage> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      TextButton(
-                        onPressed: _countdown > 0
-                            ? null
-                            : () {
-                                // TODO: 实现发送验证码功能
-                                _startCountdown();
-                              },
-                        child: Text(
-                          _countdown > 0 ? '${_countdown}秒后重试' : '获取验证码',
-                          style: TextStyle(
-                            color:
-                                _countdown > 0 ? theme.colorScheme.onSurface.withAlpha(153) : theme.colorScheme.primary,
-                          ),
-                        ),
+                      AnimatedBuilder(
+                        animation: _breathAnimation,
+                        builder: (context, child) {
+                          return Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: _showGlow && _isPhoneValid && _countdown == 0
+                                  ? [
+                                      BoxShadow(
+                                        color: theme.colorScheme.primary.withOpacity(_breathAnimation.value),
+                                        blurRadius: _breathAnimation.value * 6,
+                                        spreadRadius: _breathAnimation.value * 0.5,
+                                      ),
+                                    ]
+                                  : null,
+                            ),
+                            child: TextButton(
+                              onPressed: _countdown > 0 ? null : _startCountdown,
+                              style: TextButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                              ),
+                              child: Text(
+                                _countdown > 0 ? '${_countdown}秒后重试' : '获取验证码',
+                                style: TextStyle(
+                                  color: _countdown > 0
+                                      ? theme.colorScheme.onSurface.withAlpha(153)
+                                      : _isPhoneValid
+                                          ? theme.colorScheme.primary
+                                          : theme.colorScheme.primary.withOpacity(0.5),
+                                  fontWeight: _isPhoneValid ? FontWeight.w600 : FontWeight.normal,
+                                ),
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
                   ),
@@ -434,9 +502,8 @@ class _LoginPageState extends State<LoginPage> {
       child: RoundedLoadingButton(
         color: theme.colorScheme.primary,
         controller: _btnController,
-        onPressed: !(_isCodeValid || _isPhoneValid)
-            ? null
-            : () async {
+        onPressed: _isCodeValid || _isPhoneValid
+            ? () async {
                 setState(() {
                   _islogin = true;
                 });
@@ -447,7 +514,8 @@ class _LoginPageState extends State<LoginPage> {
                 _btnController.success();
                 await Future.delayed(Durations.medium4);
                 if (mounted) Navigator.pushReplacementNamed(context, AppRouter.home);
-              },
+              }
+            : null,
         child: Text(
           '登录',
           style: TextStyle(

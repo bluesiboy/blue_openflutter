@@ -1,6 +1,5 @@
 import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
-import 'package:adaptive_theme/adaptive_theme.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
