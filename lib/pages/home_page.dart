@@ -2,6 +2,7 @@ import 'package:blue_openflutter/controls/breath_glow_widget.dart';
 import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
+import 'chat_list_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -444,9 +445,7 @@ class _MessageTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('消息页面'),
-    );
+    return ChatListPage();
   }
 }
 
