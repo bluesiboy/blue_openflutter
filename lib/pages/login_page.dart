@@ -1,8 +1,10 @@
 import 'package:blue_openflutter/routes/app_router.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:blue_openflutter/controls/verification_code_input.dart';
+import 'package:blue_openflutter/controls/breath_glow_widget.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 
@@ -13,21 +15,17 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMixin {
+class _LoginPageState extends State<LoginPage> {
   bool _isPasswordLogin = false;
   int _countdown = 0;
   Timer? _timer;
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   late final VerificationCodeController _verificationCodeController;
+  late final BreathGlowController _breathGlowController;
   String _selectedCountryCode = '+86';
   bool _isPhoneValid = false;
   bool _isCodeValid = false;
-  bool _showGlow = false;
-  int _breathCount = 0;
-
-  late final AnimationController _breathController;
-  late final Animation<double> _breathAnimation;
 
   @override
   void initState() {
@@ -37,45 +35,17 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       length: 6,
       onCodeChanged: _validateCode,
     );
-
-    _breathController = AnimationController(
+    _breathGlowController = BreathGlowController(
+      breathCount: 4,
       duration: const Duration(seconds: 1),
-      vsync: this,
+      maxOpacity: 0.2,
     );
-
-    _breathAnimation = Tween<double>(begin: 0.0, end: 0.2).animate(
-      CurvedAnimation(
-        parent: _breathController,
-        curve: Curves.easeInOut,
-      ),
-    );
-
-    _breathController.addStatusListener((status) {
-      if (status == AnimationStatus.completed) {
-        _breathCount++;
-        if (_breathCount > 2) {
-          _breathController.stop();
-          _breathCount = 0;
-          setState(() => _showGlow = false);
-        } else {
-          _breathController.reverse();
-        }
-      } else if (status == AnimationStatus.dismissed && _breathCount < 2) {
-        _breathController.forward();
-      }
-    });
 
     _phoneController.addListener(() {
       if (_isPhoneValid && _countdown == 0) {
-        if (!_breathController.isAnimating) {
-          _breathCount = 0;
-          setState(() => _showGlow = true);
-          _breathController.forward();
-        }
+        _breathGlowController.start();
       } else {
-        _breathController.stop();
-        _breathCount = 0;
-        setState(() => _showGlow = false);
+        _breathGlowController.stop();
       }
     });
   }
@@ -86,7 +56,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
     _phoneController.dispose();
     _passwordController.dispose();
     _verificationCodeController.dispose();
-    _breathController.dispose();
+    _breathGlowController.dispose();
     super.dispose();
   }
 
@@ -113,6 +83,7 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
         }
       });
     });
+    _breathGlowController.stop();
   }
 
   @override
@@ -171,44 +142,29 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
-                      AnimatedBuilder(
-                        animation: _breathAnimation,
-                        builder: (context, child) {
-                          return Container(
-                            decoration: BoxDecoration(
+                      BreathGlowWidget(
+                        controller: _breathGlowController,
+                        glowColor: theme.colorScheme.primary,
+                        child: TextButton(
+                          onPressed: _countdown > 0 ? null : _startCountdown,
+                          style: TextButton.styleFrom(
+                            shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(20),
-                              boxShadow: _showGlow && _isPhoneValid && _countdown == 0
-                                  ? [
-                                      BoxShadow(
-                                        color: theme.colorScheme.primary.withOpacity(_breathAnimation.value),
-                                        blurRadius: _breathAnimation.value * 6,
-                                        spreadRadius: _breathAnimation.value * 0.5,
-                                      ),
-                                    ]
-                                  : null,
                             ),
-                            child: TextButton(
-                              onPressed: _countdown > 0 ? null : _startCountdown,
-                              style: TextButton.styleFrom(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                              ),
-                              child: Text(
-                                _countdown > 0 ? '${_countdown}秒后重试' : '获取验证码',
-                                style: TextStyle(
-                                  color: _countdown > 0
-                                      ? theme.colorScheme.onSurface.withAlpha(153)
-                                      : _isPhoneValid
-                                          ? theme.colorScheme.primary
-                                          : theme.colorScheme.primary.withOpacity(0.5),
-                                  fontWeight: _isPhoneValid ? FontWeight.w600 : FontWeight.normal,
-                                ),
-                              ),
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          ),
+                          child: Text(
+                            _countdown > 0 ? '$_countdown秒后再试' : '获取验证码',
+                            style: TextStyle(
+                              color: _countdown > 0
+                                  ? theme.colorScheme.onSurface.withAlpha(153)
+                                  : _isPhoneValid
+                                      ? theme.colorScheme.primary
+                                      : theme.colorScheme.primary.withOpacity(0.5),
+                              fontWeight: _isPhoneValid ? FontWeight.w600 : FontWeight.normal,
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
                     ],
                   ),
@@ -494,7 +450,6 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
   }
 
   final RoundedLoadingButtonController _btnController = RoundedLoadingButtonController();
-  bool _islogin = false;
   Widget _buildLoginButton(ThemeData theme) {
     return SizedBox(
       width: double.infinity,
@@ -502,15 +457,9 @@ class _LoginPageState extends State<LoginPage> with SingleTickerProviderStateMix
       child: RoundedLoadingButton(
         color: theme.colorScheme.primary,
         controller: _btnController,
-        onPressed: _isCodeValid || _isPhoneValid
+        onPressed: _isCodeValid || kDebugMode
             ? () async {
-                setState(() {
-                  _islogin = true;
-                });
                 await Future.delayed(Durations.long4);
-                setState(() {
-                  _islogin = true;
-                });
                 _btnController.success();
                 await Future.delayed(Durations.medium4);
                 if (mounted) Navigator.pushReplacementNamed(context, AppRouter.home);

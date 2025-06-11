@@ -1,3 +1,4 @@
+import 'package:blue_openflutter/controls/breath_glow_widget.dart';
 import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
@@ -449,8 +450,24 @@ class _MessageTab extends StatelessWidget {
   }
 }
 
-class _ProfileTab extends StatelessWidget {
+class _ProfileTab extends StatefulWidget {
   const _ProfileTab();
+
+  @override
+  State<_ProfileTab> createState() => _ProfileTabState();
+}
+
+class _ProfileTabState extends State<_ProfileTab> {
+  late final BreathGlowController _breathGlowController2;
+  @override
+  void initState() {
+    super.initState();
+    _breathGlowController2 = BreathGlowController(
+      breathCount: 14,
+      duration: const Duration(seconds: 1),
+      maxOpacity: 0.2,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -506,10 +523,14 @@ class _ProfileTab extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  '用户名',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
+                BreathGlowWidget(
+                  controller: _breathGlowController2,
+                  glowColor: theme.colorScheme.primary,
+                  child: Text(
+                    '用户名',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -520,11 +541,16 @@ class _ProfileTab extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                OutlinedButton(
-                  onPressed: () {
-                    // TODO: 编辑个人资料
-                  },
-                  child: const Text('编辑资料'),
+                BreathGlowWidget(
+                  controller: _breathGlowController2,
+                  glowColor: theme.colorScheme.primary,
+                  child: OutlinedButton(
+                    onPressed: () {
+                      // TODO: 编辑个人资料
+                      _breathGlowController2.start();
+                    },
+                    child: const Text('编辑资料'),
+                  ),
                 ),
               ],
             ),

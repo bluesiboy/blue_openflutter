@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:blue_openflutter/models/theme_style_config.dart';
 import 'package:blue_openflutter/providers/theme_style_provider.dart';
+import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import 'package:adaptive_theme/adaptive_theme.dart';
@@ -102,6 +103,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: ElevatedButton(
               onPressed: () {
                 // TODO: 实现退出登录功能
+                Navigator.pushReplacementNamed(context, AppRouter.login);
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: theme.colorScheme.error,
