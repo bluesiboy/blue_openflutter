@@ -1,7 +1,3 @@
-import 'dart:io';
-
-import 'package:blue_openflutter/models/theme_style_config.dart';
-import 'package:blue_openflutter/providers/theme_style_provider.dart';
 import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'dart:ui';
@@ -9,8 +5,6 @@ import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
-import 'package:provider/provider.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});

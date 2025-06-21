@@ -23,6 +23,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
   bool _isEmojiVisible = false;
   bool _isMoreVisible = false;
   bool _isRecording = false;
+  bool _isKeyboardVisible = false;
   late AnimationController _animationController;
   late Animation<double> _animation;
 
@@ -44,7 +45,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
     {
       'fromMe': false,
       'type': 'image',
-      'content': 'https://picsum.photos/200/300',
+      'content': 'https://via.placeholder.com/200x300/4CAF50/FFFFFF?text=图片',
       'time': '09:32',
       'status': 'read',
     },
@@ -76,6 +77,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
       curve: Curves.easeInOut,
     );
     _focusNode.addListener(_onFocusChange);
+    _controller.addListener(_onTextChanged);
   }
 
   void _onFocusChange() {
@@ -85,6 +87,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
         _isMoreVisible = false;
       });
     }
+  }
+
+  void _onTextChanged() {
+    setState(() {
+      // 触发重建以更新按钮状态
+    });
   }
 
   @override
@@ -98,12 +106,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
 
   void _sendMessage(String text) {
     if (text.trim().isEmpty) return;
+
+    // 获取当前时间
+    final now = DateTime.now();
+    final timeString = '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+
     setState(() {
       messages.add({
         'fromMe': true,
         'type': 'text',
         'content': text,
-        'time': '现在',
+        'time': timeString,
         'status': 'sending',
       });
     });
@@ -371,7 +384,12 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
                         if (msg['fromMe']) ...[
                           const SizedBox(width: 8),
                           CircleAvatar(
-                            backgroundImage: const NetworkImage('https://i.pravatar.cc/150?img=1'),
+                            backgroundColor: theme.colorScheme.primaryContainer,
+                            child: Icon(
+                              Icons.person,
+                              size: 16,
+                              color: theme.colorScheme.onPrimaryContainer,
+                            ),
                             radius: 16,
                           ),
                         ],
@@ -391,10 +409,38 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
   }
 
   Widget _buildEmojiList() {
+    // 定义表情列表
+    final emojis = [
+      '😊',
+      '😂',
+      '🤣',
+      '❤️',
+      '😍',
+      '😘',
+      '😋',
+      '😎',
+      '🤔',
+      '😭',
+      '😡',
+      '😱',
+      '😴',
+      '🤗',
+      '🤫',
+      '🤐',
+      '😶',
+      '😐',
+      '😑',
+      '😯',
+      '😦',
+      '😧',
+      '😮',
+      '😲'
+    ];
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
-      height: 200,
+      height: 240,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
@@ -417,20 +463,17 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
               padding: const EdgeInsets.all(16),
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 8,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                childAspectRatio: 1.0,
               ),
-              itemCount: 24,
+              itemCount: emojis.length,
               itemBuilder: (context, index) {
                 return GestureDetector(
                   onTap: () {
+                    _sendMessage(emojis[index]);
                     setState(() {
-                      messages.add({
-                        'content': '😊',
-                        'fromMe': true,
-                        'type': 'text',
-                        'time': DateTime.now(),
-                      });
+                      _isEmojiVisible = false;
                     });
                   },
                   child: Container(
@@ -438,57 +481,15 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
                       color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.5),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: Text(
-                        '😊',
-                        style: TextStyle(fontSize: 24),
+                        emojis[index],
+                        style: const TextStyle(fontSize: 24),
                       ),
                     ),
                   ),
                 );
               },
-            ),
-          ),
-          Container(
-            height: 44,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface,
-              border: Border(
-                top: BorderSide(
-                  color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
-                ),
-              ),
-            ),
-            child: Row(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.emoji_emotions_outlined),
-                  onPressed: () {
-                    setState(() {
-                      _isEmojiVisible = !_isEmojiVisible;
-                      _isMoreVisible = false;
-                    });
-                  },
-                ),
-                const Spacer(),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: () {
-                    if (_controller.text.isNotEmpty) {
-                      setState(() {
-                        messages.add({
-                          'content': _controller.text,
-                          'fromMe': true,
-                          'type': 'text',
-                          'time': DateTime.now(),
-                        });
-                        _controller.clear();
-                      });
-                    }
-                  },
-                ),
-              ],
             ),
           ),
         ],
@@ -504,12 +505,26 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
       {'icon': Icons.phone, 'label': '语音通话'},
       {'icon': Icons.video_call, 'label': '视频通话'},
       {'icon': Icons.file_copy, 'label': '文件'},
+      {'icon': Icons.camera_alt, 'label': '拍摄'},
+      {'icon': Icons.record_voice_over, 'label': '录音'},
+      {'icon': Icons.contact_phone, 'label': '联系人'},
+      {'icon': Icons.schedule, 'label': '日程'},
+      {'icon': Icons.payment, 'label': '转账'},
+      {'icon': Icons.games, 'label': '游戏'},
     ];
+
+    // 计算需要的行数
+    final crossAxisCount = 4; // 每行4个项目
+    final rowCount = (addItems.length / crossAxisCount).ceil();
+    final itemHeight = 80.0; // 每个项目的高度
+    final padding = 32.0; // 上下padding
+    final spacing = 16.0 * (rowCount - 1); // 行间距
+    final calculatedHeight = rowCount * itemHeight + padding + spacing;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOut,
-      height: 200,
+      height: calculatedHeight,
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         border: Border(
@@ -525,58 +540,55 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
           ),
         ],
       ),
-      child: Column(
-        children: [
-          Expanded(
-            child: GridView.builder(
-              padding: const EdgeInsets.all(16),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 4,
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: 1.2,
-              ),
-              itemCount: addItems.length,
-              itemBuilder: (context, index) {
-                final item = addItems[index];
-                return GestureDetector(
-                  onTap: () {
-                    // TODO: 处理功能点击
-                  },
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 48,
-                        height: 48,
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).colorScheme.primaryContainer,
-                          borderRadius: BorderRadius.circular(12),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Icon(
-                          item['icon'] as IconData,
-                          color: Theme.of(context).colorScheme.onPrimaryContainer,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        item['label']!,
-                        style: Theme.of(context).textTheme.bodySmall,
+      child: GridView.builder(
+        padding: const EdgeInsets.all(16),
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          mainAxisSpacing: 16,
+          crossAxisSpacing: 16,
+          childAspectRatio: 0.8,
+        ),
+        itemCount: addItems.length,
+        itemBuilder: (context, index) {
+          final item = addItems[index];
+          return GestureDetector(
+            onTap: () {
+              // TODO: 处理功能点击
+            },
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).colorScheme.primaryContainer,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                );
-              },
+                  child: Icon(
+                    item['icon'] as IconData,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  item['label']! as String,
+                  style: Theme.of(context).textTheme.bodySmall,
+                  textAlign: TextAlign.center,
+                ),
+              ],
             ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -602,6 +614,145 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
       child: SafeArea(
         child: Row(
           children: [
+            // 键盘/语音切换按钮
+            IconButton(
+              icon: Icon(
+                _isKeyboardVisible ? Icons.mic : Icons.keyboard,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              onPressed: () {
+                setState(() {
+                  _isKeyboardVisible = !_isKeyboardVisible;
+                  _isEmojiVisible = false;
+                  _isMoreVisible = false;
+                });
+                if (_isKeyboardVisible) {
+                  _focusNode.requestFocus();
+                } else {
+                  _focusNode.unfocus();
+                }
+              },
+            ),
+            // 输入框或语音按钮
+            Expanded(
+              child: _isKeyboardVisible
+                  ? Expanded(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(
+                          minHeight: 36,
+                          maxHeight: 120,
+                        ),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Theme.of(context).colorScheme.surfaceVariant,
+                            borderRadius: BorderRadius.circular(18),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: TextField(
+                            controller: _controller,
+                            focusNode: _focusNode,
+                            minLines: 1,
+                            maxLines: null,
+                            textInputAction: TextInputAction.newline,
+                            textAlignVertical: TextAlignVertical.center,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Theme.of(context).colorScheme.onSurfaceVariant,
+                              fontWeight: FontWeight.w500,
+                              height: 1.0,
+                            ),
+                            strutStyle: StrutStyle(
+                              forceStrutHeight: true,
+                              height: 1.0,
+                              leading: 0.5,
+                            ),
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+                              border: InputBorder.none,
+                              isDense: true,
+                              hintText: '输入消息...',
+                              hintStyle: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurfaceVariant.withOpacity(0.6),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                                height: 1.0,
+                              ),
+                            ),
+                            onSubmitted: (text) {
+                              if (text.trim().isNotEmpty) {
+                                _sendMessage(text);
+                              }
+                            },
+                          ),
+                        ),
+                      ),
+                    )
+                  : GestureDetector(
+                      onLongPressStart: (details) {
+                        setState(() {
+                          _isRecording = true;
+                        });
+                        // TODO: 开始录音
+                      },
+                      onLongPressEnd: (details) {
+                        setState(() {
+                          _isRecording = false;
+                        });
+                        // TODO: 结束录音
+                      },
+                      child: AnimatedContainer(
+                        duration: const Duration(milliseconds: 200),
+                        height: 36,
+                        decoration: BoxDecoration(
+                          color: _isRecording
+                              ? Theme.of(context).colorScheme.errorContainer
+                              : Theme.of(context).colorScheme.surfaceVariant,
+                          borderRadius: BorderRadius.circular(18),
+                          boxShadow: [
+                            BoxShadow(
+                              color: (_isRecording
+                                      ? Theme.of(context).colorScheme.error
+                                      : Theme.of(context).colorScheme.primary)
+                                  .withOpacity(0.1),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Icon(
+                              _isRecording ? Icons.mic : Icons.mic_none,
+                              size: 18,
+                              color: _isRecording
+                                  ? Theme.of(context).colorScheme.onErrorContainer
+                                  : Theme.of(context).colorScheme.onSurfaceVariant,
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              _isRecording ? '松开发送' : '按住说话',
+                              style: TextStyle(
+                                color: _isRecording
+                                    ? Theme.of(context).colorScheme.onErrorContainer
+                                    : Theme.of(context).colorScheme.onSurfaceVariant,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+            ),
+            // 表情按钮
             IconButton(
               icon: Icon(
                 _isEmojiVisible ? Icons.keyboard : Icons.emoji_emotions_outlined,
@@ -611,73 +762,47 @@ class _ChatDetailPageState extends State<ChatDetailPage> with SingleTickerProvid
                 setState(() {
                   _isEmojiVisible = !_isEmojiVisible;
                   _isMoreVisible = false;
+                  _isKeyboardVisible = false;
                 });
+                if (_isEmojiVisible) {
+                  _focusNode.unfocus();
+                }
               },
             ),
-            Expanded(
-              child: GestureDetector(
-                onLongPressStart: (details) {
-                  setState(() {
-                    _isRecording = true;
-                  });
-                  // TODO: 开始录音
+            // 加号按钮或发送按钮
+            IconButton(
+              icon: AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (Widget child, Animation<double> animation) {
+                  return ScaleTransition(
+                    scale: animation,
+                    child: FadeTransition(
+                      opacity: animation,
+                      child: child,
+                    ),
+                  );
                 },
-                onLongPressEnd: (details) {
-                  setState(() {
-                    _isRecording = false;
-                  });
-                  // TODO: 结束录音
-                },
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 200),
-                  height: 36,
-                  decoration: BoxDecoration(
-                    color: _isRecording
-                        ? Theme.of(context).colorScheme.errorContainer
-                        : Theme.of(context).colorScheme.surfaceVariant,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [
-                      BoxShadow(
-                        color:
-                            (_isRecording ? Theme.of(context).colorScheme.error : Theme.of(context).colorScheme.primary)
-                                .withOpacity(0.1),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        _isRecording ? Icons.mic : Icons.mic_none,
-                        size: 20,
-                        color: _isRecording
-                            ? Theme.of(context).colorScheme.onErrorContainer
-                            : Theme.of(context).colorScheme.onSurfaceVariant,
-                      ),
-                      const SizedBox(width: 4),
-                      Text(
-                        _isRecording ? '松开发送' : '按住说话',
-                        style: TextStyle(
-                          color: _isRecording
-                              ? Theme.of(context).colorScheme.onErrorContainer
-                              : Theme.of(context).colorScheme.onSurfaceVariant,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
-                  ),
+                child: Icon(
+                  _controller.text.trim().isNotEmpty ? Icons.send : Icons.add_circle_outline,
+                  key: ValueKey(_controller.text.trim().isNotEmpty),
+                  color: Theme.of(context).colorScheme.primary,
                 ),
               ),
-            ),
-            IconButton(
-              icon: const Icon(Icons.add_circle_outline),
               onPressed: () {
-                setState(() {
-                  _isMoreVisible = !_isMoreVisible;
-                  _isEmojiVisible = false;
-                });
+                if (_controller.text.trim().isNotEmpty) {
+                  // 发送消息
+                  _sendMessage(_controller.text);
+                } else {
+                  // 显示更多功能
+                  setState(() {
+                    _isMoreVisible = !_isMoreVisible;
+                    _isEmojiVisible = false;
+                    _isKeyboardVisible = false;
+                  });
+                  if (_isMoreVisible) {
+                    _focusNode.unfocus();
+                  }
+                }
               },
             ),
           ],

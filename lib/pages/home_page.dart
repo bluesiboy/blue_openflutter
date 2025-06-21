@@ -445,7 +445,7 @@ class _MessageTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChatListPage();
+    return const ChatListPage();
   }
 }
 
