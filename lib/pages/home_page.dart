@@ -1,7 +1,6 @@
 import 'package:blue_openflutter/controls/breath_glow_widget.dart';
 import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
-import 'package:adaptive_theme/adaptive_theme.dart';
 import 'chat_list_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -102,7 +101,6 @@ class _HomeTab extends StatefulWidget {
 
 class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
-  late Animation<double> _animation;
   final _searchController = TextEditingController();
   bool _isSearching = false;
 
@@ -112,10 +110,6 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
-    );
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
     );
   }
 
@@ -353,7 +347,6 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
   }
 
   Widget _buildNotificationList(BuildContext context, ScrollController scrollController) {
-    final theme = Theme.of(context);
     final notifications = [
       {
         'title': '系统通知',
@@ -476,7 +469,6 @@ class _ProfileTabState extends State<_ProfileTab> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return CustomScrollView(
       slivers: [
         SliverAppBar(
