@@ -1,18 +1,13 @@
+import 'package:blue_openflutter/pages/chat_detail_page.dart';
 import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
-import 'package:lottie/lottie.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'dart:math';
-import 'dart:io';
 import 'dart:convert';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:animated_text_kit/animated_text_kit.dart';
-import 'dart:math' as math;
 import '../models/chat_item.dart';
 import '../models/message_model.dart';
-import 'chat_detail_page.dart';
 
 class ChatListLayout {
   // ===================== 常规模式参数 =====================
@@ -264,6 +259,7 @@ Widget buildChatContentWithUnreadAnim(
 }
 
 // ===================== 聊天项组件 =====================
+/// 聊天列表单项组件，支持滑动操作、点击进入详情、高亮动画等
 class ChatListItem extends StatefulWidget {
   final ChatItem chat;
   final int index;
@@ -324,6 +320,7 @@ class _ChatListItemState extends State<ChatListItem> with TickerProviderStateMix
     }
   }
 
+  /// 处理高亮动画的触发与结束
   void _handleHighlightChange() {
     if (widget.highlight && !_controller.isAnimating) {
       _controller.forward(from: 0);
@@ -392,13 +389,19 @@ class _ChatListItemState extends State<ChatListItem> with TickerProviderStateMix
           onTap: () {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (context) => ChatDetailPage(
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) => ChatDetailPage(
                   userName: chat.name,
                   avatar: chat.avatar,
                   isGroup: chat.isGroup,
                   isOnline: chat.isOnline,
                 ),
+                transitionsBuilder: (_, animation, __, child) {
+                  return FadeTransition(
+                    opacity: animation,
+                    child: child,
+                  );
+                },
               ),
             );
           },
@@ -476,6 +479,7 @@ class _ChatListItemState extends State<ChatListItem> with TickerProviderStateMix
 }
 
 // ===================== 主页面 =====================
+/// 聊天列表主题页面，包含分组、滚动、动画、拖拽排序等功能
 class ChatListThemePage extends StatefulWidget {
   const ChatListThemePage({Key? key}) : super(key: key);
 
@@ -511,7 +515,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     super.dispose();
   }
 
-  // 滚动监听器
+  /// 滚动监听器，控制"回到顶部"按钮显示
   void _onScroll() {
     final showButton = _scrollController.offset > 200;
     if (showButton != _showScrollToTop) {
@@ -521,7 +525,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     }
   }
 
-  // 平滑滚动到顶部
+  /// 平滑滚动到顶部
   void _scrollToTop() {
     _scrollController.animateTo(
       0,
@@ -530,7 +534,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     );
   }
 
-  // 平滑滚动到底部
+  /// 平滑滚动到底部
   void _scrollToBottom() {
     _scrollController.animateTo(
       _scrollController.position.maxScrollExtent,
@@ -539,7 +543,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     );
   }
 
-  // 平滑滚动到指定聊天项
+  /// 平滑滚动到指定聊天项
   void _scrollToChat(int chatIndex) {
     if (chatIndex < 0 || chatIndex >= _chatList.length) return;
 
@@ -570,7 +574,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     );
   }
 
-  // 计算置顶聊天项的位置
+  /// 计算置顶聊天项的位置
   double _calculatePinnedChatOffset(int pinnedIndex) {
     double offset = 0;
 
@@ -583,7 +587,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     return offset;
   }
 
-  // 计算普通聊天项的位置
+  /// 计算普通聊天项的位置
   double _calculateNormalChatOffset(int normalIndex) {
     double offset = 0;
 
@@ -602,6 +606,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     return offset;
   }
 
+  /// 加载头像资源并生成聊天数据
   Future<void> _loadAvatars() async {
     final manifestContent = await rootBundle.loadString('AssetManifest.json');
     final Map<String, dynamic> manifestMap = json.decode(manifestContent);
@@ -618,6 +623,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     });
   }
 
+  /// 生成模拟聊天数据
   ChatItem generateMsg(int i) {
     return ChatItem(
       avatar: _avatarFiles[i],
@@ -645,25 +651,25 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     );
   }
 
-  // 清除缓存，强制重新计算分组
+  /// 清除分组缓存，强制重新计算
   void _clearCache() {
     _cachedPinnedChats = null;
     _cachedNormalChats = null;
   }
 
-  // 聊天分组逻辑：置顶、普通聊天
+  /// 获取置顶聊天分组
   List<ChatItem> get _pinnedChats {
     _cachedPinnedChats ??= _chatList.where((c) => c.isPinned).toList();
     return _cachedPinnedChats!;
   }
 
-  // 普通聊天组：所有非置顶项（包括群聊和普通聊天）
+  /// 获取普通聊天分组
   List<ChatItem> get _normalChats {
     _cachedNormalChats ??= _chatList.where((c) => !c.isPinned).toList();
     return _cachedNormalChats!;
   }
 
-  // 拖拽排序仅支持普通分组
+  /// 拖拽排序，仅支持普通分组
   void _onReorderNormal(int oldIndex, int newIndex) {
     setState(() {
       final normalIndexes = _chatList.asMap().entries.where((e) => !e.value.isPinned).map((e) => e.key).toList();
@@ -678,7 +684,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     });
   }
 
-  // 平滑滚动到指定聊天项并高亮
+  /// 平滑滚动到指定聊天项并高亮
   void _scrollToChatAndHighlight(int chatIndex) {
     if (chatIndex < 0 || chatIndex >= _chatList.length) return;
 
@@ -693,7 +699,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     });
   }
 
-  // 自定义动画滚动效果
+  /// 自定义动画滚动效果（波浪式弹性滚动）
   void _scrollWithCustomAnimation() {
     if (_chatList.isEmpty) return;
 
@@ -717,7 +723,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     });
   }
 
-  // 计算任意聊天项的位置
+  /// 计算任意聊天项的位置
   double _calculateChatOffset(int chatIndex) {
     if (chatIndex < 0 || chatIndex >= _chatList.length) return 0;
 
@@ -981,7 +987,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     );
   }
 
-  // 提取聊天项构建方法
+  /// 构建分组下的聊天项（带动画）
   List<Widget> _buildChatItemsWithAnimation(List<ChatItem> chats, int startOrder) {
     return chats
         .asMap()
@@ -993,6 +999,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
         .toList();
   }
 
+  /// 构建页面背景渐变
   Widget _buildBackground() {
     final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Container(
@@ -1019,6 +1026,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     );
   }
 
+  /// 构建单个聊天项
   Widget _buildChatItem(ChatItem chat, int index, {int? animationOrder}) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return ChatListItem(
@@ -1074,7 +1082,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
     );
   }
 
-  // 分组标题组件
+  /// 分组标题组件
   Widget _buildGroupTitle(String title) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 2),
@@ -1087,6 +1095,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
 }
 
 // ===================== 自定义画笔 =====================
+/// 流光高亮边框画笔
 class FlowingBorderPainter extends CustomPainter {
   final double progress;
   final double borderRadius;
@@ -1141,6 +1150,7 @@ class FlowingBorderPainter extends CustomPainter {
   }
 }
 
+/// 静态边框画笔
 class StaticBorderPainter extends CustomPainter {
   final double borderRadius;
   final double borderWidth;

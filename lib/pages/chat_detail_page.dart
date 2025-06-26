@@ -327,13 +327,6 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
-      leading: IconButton(
-        icon: Icon(
-          Icons.arrow_back_ios,
-          color: isDark ? Colors.white : Colors.black87,
-        ),
-        onPressed: () => Navigator.pop(context),
-      ),
       title: Row(
         children: [
           Stack(
@@ -362,7 +355,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
                     width: 40,
                     height: 40,
                     color: Colors.grey[300],
-                    child: Icon(Icons.person, color: Colors.white54, size: 24),
+                    child: const Icon(Icons.person, color: Colors.white54, size: 24),
                   ),
                 ),
               ),
@@ -396,12 +389,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
                   ),
                 ),
                 if (widget.isOnline)
-                  Text(
+                  const Text(
                     '在线',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.greenAccent,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.greenAccent),
                   ),
               ],
             ),
@@ -485,43 +475,39 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
 
   Widget _buildMessageItem(Message msg, int index, bool isDark) {
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: ChatDetailLayout.messageSpacing / 2),
+      padding: const EdgeInsets.symmetric(vertical: ChatDetailLayout.messageSpacing / 2),
       child: Row(
         mainAxisAlignment: msg.fromMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!msg.fromMe) ...[
-            Stack(
-              children: [
-                Container(
+            Container(
+              width: ChatDetailLayout.avatarSize,
+              height: ChatDetailLayout.avatarSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.blueAccent.withOpacity(0.28),
+                    blurRadius: 10,
+                    spreadRadius: 2,
+                  ),
+                ],
+              ),
+              child: ClipOval(
+                child: Image.asset(
+                  widget.avatar,
                   width: ChatDetailLayout.avatarSize,
                   height: ChatDetailLayout.avatarSize,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: isDark ? Colors.blueGrey.withValues(alpha: 70) : Colors.blueAccent.withValues(alpha: 45),
-                        blurRadius: 6,
-                        spreadRadius: 1,
-                      ),
-                    ],
-                  ),
-                ),
-                ClipOval(
-                  child: Image.asset(
-                    widget.avatar,
+                  fit: BoxFit.cover,
+                  errorBuilder: (ctx, error, stack) => Container(
                     width: ChatDetailLayout.avatarSize,
                     height: ChatDetailLayout.avatarSize,
-                    fit: BoxFit.cover,
-                    errorBuilder: (ctx, error, stack) => Container(
-                      width: ChatDetailLayout.avatarSize,
-                      height: ChatDetailLayout.avatarSize,
-                      color: Colors.grey[300],
-                      child: Icon(Icons.person, color: Colors.white54, size: 20),
-                    ),
+                    color: Colors.grey[300],
+                    child: const Icon(Icons.person, color: Colors.white54, size: 20),
                   ),
                 ),
-              ],
+              ),
             ),
             const SizedBox(width: 8),
           ],
@@ -542,19 +528,20 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
               height: ChatDetailLayout.avatarSize,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: isDark ? Colors.blueGrey.withValues(alpha: 80) : Colors.blueAccent.withValues(alpha: 25),
                 boxShadow: [
                   BoxShadow(
-                    color: isDark ? Colors.blueGrey.withValues(alpha: 40) : Colors.blueAccent.withValues(alpha: 20),
-                    blurRadius: 4,
-                    spreadRadius: 1,
+                    color: Colors.blueAccent.withOpacity(0.28),
+                    blurRadius: 10,
+                    spreadRadius: 2,
                   ),
                 ],
               ),
-              child: Icon(
-                Icons.person,
-                size: 20,
-                color: isDark ? Colors.white70 : Colors.blueAccent,
+              child: ClipOval(
+                child: Icon(
+                  Icons.person,
+                  size: 20,
+                  color: isDark ? Colors.white70 : Colors.blueAccent,
+                ),
               ),
             ),
           ],
@@ -639,7 +626,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: ChatDetailLayout.blurAmount, sigmaY: ChatDetailLayout.blurAmount),
           child: Container(
-            padding: EdgeInsets.all(ChatDetailLayout.bubblePadding),
+            padding: const EdgeInsets.all(ChatDetailLayout.bubblePadding),
             decoration: BoxDecoration(
               color: msg.fromMe
                   ? Colors.blueAccent.withOpacity(isDark ? 0.10 : 0.13)
@@ -680,7 +667,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
             color: isDark ? Colors.white54 : Colors.grey,
           )
         else if (msg.status == 'read')
-          Icon(
+          const Icon(
             Icons.done_all,
             size: ChatDetailLayout.statusIconSize,
             color: Colors.blueAccent,
@@ -800,9 +787,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
             borderRadius: BorderRadius.circular(12),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 8),
-                blurRadius: 3,
-                offset: const Offset(0, 1),
+                color: Colors.black.withOpacity(0.10),
+                blurRadius: 8,
+                offset: Offset(0, 2),
               ),
             ],
           ),
@@ -1003,7 +990,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
       ),
       child: SafeArea(
         child: Padding(
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: ChatDetailLayout.inputHorizontalPadding,
             vertical: ChatDetailLayout.inputPadding,
           ),
@@ -1052,7 +1039,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
                             color: isDark ? Colors.white : Colors.black87,
                           ),
                           decoration: InputDecoration(
-                            contentPadding: EdgeInsets.symmetric(
+                            contentPadding: const EdgeInsets.symmetric(
                               horizontal: ChatDetailLayout.inputHorizontalPadding,
                               vertical: ChatDetailLayout.inputVerticalPadding,
                             ),
@@ -1183,47 +1170,54 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface.withOpacity(0.95),
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.grey.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(2),
+      builder: (context) => BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 18, sigmaY: 18),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface.withOpacity(0.75),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+            border: Border.all(
+              color: Theme.of(context).colorScheme.outline.withOpacity(0.08),
+              width: 1,
+            ),
+          ),
+          child: SafeArea(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
                 ),
-              ),
-              ListTile(
-                leading: const Icon(Icons.search),
-                title: const Text('搜索聊天记录'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.notifications_off),
-                title: const Text('消息免打扰'),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text('清空聊天记录', style: TextStyle(color: Colors.red)),
-                onTap: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: 16),
-            ],
+                ListTile(
+                  leading: const Icon(Icons.search),
+                  title: const Text('搜索聊天记录'),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.notifications_off),
+                  title: const Text('消息免打扰'),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                ListTile(
+                  leading: const Icon(Icons.delete, color: Colors.red),
+                  title: const Text('清空聊天记录', style: TextStyle(color: Colors.red)),
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                ),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
