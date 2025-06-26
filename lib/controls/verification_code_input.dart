@@ -6,6 +6,7 @@ class VerificationCodeController {
   final List<FocusNode> _focusNodes = [];
   final int length;
   final Function(String)? onCodeChanged;
+  String? lastCode;
 
   VerificationCodeController({
     required this.length,
@@ -57,6 +58,7 @@ class VerificationCodeController {
     for (var controller in _controllers) {
       code += controller.text;
     }
+    lastCode = code;
     if (onCodeChanged != null) onCodeChanged!(code);
   }
 

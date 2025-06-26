@@ -122,7 +122,7 @@ class _BreathGlowWidgetState extends State<BreathGlowWidget> with SingleTickerPr
             boxShadow: widget.controller.isAnimating
                 ? [
                     BoxShadow(
-                      color: widget.glowColor.withOpacity(opacity),
+                      color: widget.glowColor.withValues(alpha: 255 * opacity),
                       blurRadius: widget.blurRadius * opacity * 2,
                       spreadRadius: widget.spreadRadius * opacity * 2,
                     ),

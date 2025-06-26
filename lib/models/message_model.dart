@@ -1,18 +1,18 @@
 class Message {
-  final bool fromMe;
-  final String type;
+  final String type; // text, image, voice, file, emoji
   final String content;
-  final String time;
-  String status;
+  final bool fromMe;
+  String time;
+  String status; // 可选: 发送状态
   final double? width;
   final double? height;
 
   Message({
-    required this.fromMe,
     required this.type,
     required this.content,
     required this.time,
-    required this.status,
+    this.fromMe = false,
+    this.status = '',
     this.width,
     this.height,
   });

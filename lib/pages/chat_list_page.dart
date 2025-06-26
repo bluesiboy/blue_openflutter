@@ -13,7 +13,6 @@ class ChatListPage extends StatefulWidget {
 class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderStateMixin {
   final GlobalKey _addMenuKey = GlobalKey();
   late AnimationController _animationController;
-  late Animation<double> _animation;
   final _searchController = TextEditingController();
   bool _isSearching = false;
 
@@ -57,10 +56,6 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 200),
       vsync: this,
-    );
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
     );
   }
 
@@ -285,7 +280,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                 decoration: InputDecoration(
                   hintText: '搜索',
                   hintStyle: theme.textTheme.titleMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.5),
                   ),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
@@ -414,7 +409,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                       Text(
                         chat.time,
                         style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurface.withOpacity(0.6),
+                          color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                         ),
                       ),
                     ],
@@ -427,7 +422,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                           child: Icon(
                             Icons.volume_off,
                             size: 16,
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                           ),
                         ),
                       Expanded(
@@ -436,7 +431,7 @@ class _ChatListPageState extends State<ChatListPage> with SingleTickerProviderSt
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.onSurface.withOpacity(0.6),
+                            color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                           ),
                         ),
                       ),

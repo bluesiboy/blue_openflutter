@@ -352,12 +352,12 @@ class _SettingsPageState extends State<SettingsPage> {
                   color: color ?? Theme.of(context).colorScheme.primary,
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: Theme.of(context).dividerColor.withOpacity(0.2),
+                    color: Theme.of(context).dividerColor.withValues(alpha: 255 * 0.2),
                     width: 1,
                   ),
                   boxShadow: [
                     BoxShadow(
-                      color: (color ?? Theme.of(context).colorScheme.primary).withOpacity(0.2),
+                      color: (color ?? Theme.of(context).colorScheme.primary).withValues(alpha: 255 * 0.2),
                       blurRadius: 8,
                       spreadRadius: 1,
                     ),
@@ -397,7 +397,7 @@ class _SettingsPageState extends State<SettingsPage> {
           : Text(
               subTitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                   ),
             ),
       value: value,
@@ -482,11 +482,14 @@ class _SettingsPageState extends State<SettingsPage> {
           width: 90,
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: isSelected ? Theme.of(context).colorScheme.primaryContainer.withOpacity(0.1) : Colors.transparent,
+            color: isSelected
+                ? Theme.of(context).colorScheme.primaryContainer.withValues(alpha: 255 * 0.1)
+                : Colors.transparent,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color:
-                  isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor.withOpacity(0.1),
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).dividerColor.withValues(alpha: 255 * 0.1),
               width: 1,
             ),
           ),
@@ -498,7 +501,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 size: 24,
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
               ),
               const SizedBox(height: 8),
               Text(
@@ -615,7 +618,7 @@ class _SettingsPageState extends State<SettingsPage> {
       thickness: 0.5,
       indent: 16,
       endIndent: 16,
-      color: Theme.of(context).dividerColor.withOpacity(0.08),
+      color: Theme.of(context).dividerColor.withValues(alpha: 255 * 0.08),
     );
   }
 
@@ -704,7 +707,7 @@ class _SettingsPageState extends State<SettingsPage> {
       padding: const EdgeInsets.all(16),
       child: Container(
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surfaceVariant.withOpacity(0.3),
+          color: Theme.of(context).colorScheme.surfaceVariant.withValues(alpha: 255 * 0.3),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Row(
@@ -808,9 +811,9 @@ class _SettingsPageState extends State<SettingsPage> {
                 overlayRadius: 16,
               ),
               activeTrackColor: Theme.of(context).colorScheme.primary,
-              inactiveTrackColor: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              inactiveTrackColor: Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.2),
               thumbColor: Theme.of(context).colorScheme.primary,
-              overlayColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              overlayColor: Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.1),
             ),
             child: Slider(
               value: value,
@@ -840,7 +843,7 @@ class _SettingsPageState extends State<SettingsPage> {
       style: Theme.of(context).textTheme.bodySmall?.copyWith(
             color: isSelected
                 ? Theme.of(context).colorScheme.primary
-                : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
             fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
           ),
     );
@@ -859,7 +862,7 @@ class _SettingsPageState extends State<SettingsPage> {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Theme.of(context).dividerColor.withOpacity(0.1),
+              color: Theme.of(context).dividerColor.withValues(alpha: 255 * 0.1),
             ),
           ),
           child: Stack(
@@ -877,7 +880,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           width: 60,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                            color: Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.2),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -886,7 +889,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           width: 120,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -895,7 +898,7 @@ class _SettingsPageState extends State<SettingsPage> {
                           width: 80,
                           height: 8,
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.onSurface.withOpacity(0.1),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.1),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -958,8 +961,9 @@ class _SettingsPageState extends State<SettingsPage> {
             color: isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(8),
             border: Border.all(
-              color:
-                  isSelected ? Theme.of(context).colorScheme.primary : Theme.of(context).dividerColor.withOpacity(0.1),
+              color: isSelected
+                  ? Theme.of(context).colorScheme.primary
+                  : Theme.of(context).dividerColor.withValues(alpha: 255 * 0.1),
             ),
           ),
           child: Icon(
@@ -967,7 +971,7 @@ class _SettingsPageState extends State<SettingsPage> {
             size: 20,
             color: isSelected
                 ? Theme.of(context).colorScheme.onPrimary
-                : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
           ),
         ),
       ),
@@ -1042,7 +1046,7 @@ class _SettingsPageState extends State<SettingsPage> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-              color: Theme.of(context).shadowColor.withOpacity(0.1),
+              color: Theme.of(context).shadowColor.withValues(alpha: 255 * 0.1),
               blurRadius: 8,
               offset: const Offset(0, 4),
             ),
@@ -1072,7 +1076,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 width: 24,
                 height: 2,
                 decoration: BoxDecoration(
-                  color: textColor.withOpacity(0.5),
+                  color: textColor.withValues(alpha: 255 * 0.5),
                   borderRadius: BorderRadius.circular(1),
                 ),
               ),
@@ -1101,8 +1105,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                    Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+                    Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.1),
+                    Theme.of(context).colorScheme.secondary.withValues(alpha: 255 * 0.1),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
@@ -1176,7 +1180,7 @@ class _SettingsPageState extends State<SettingsPage> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                    color: Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.3),
                     blurRadius: 12,
                     offset: const Offset(0, 4),
                   ),
@@ -1225,8 +1229,8 @@ class _SettingsPageState extends State<SettingsPage> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
           colors: [
-            Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            Theme.of(context).colorScheme.secondary.withOpacity(0.1),
+            Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.1),
+            Theme.of(context).colorScheme.secondary.withValues(alpha: 255 * 0.1),
           ],
         ),
       ),
@@ -1236,10 +1240,10 @@ class _SettingsPageState extends State<SettingsPage> {
           filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
           child: Container(
             decoration: BoxDecoration(
-              color: Theme.of(context).colorScheme.surface.withOpacity(0.1),
+              color: Theme.of(context).colorScheme.surface.withValues(alpha: 255 * 0.1),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
-                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                color: Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.1),
                 width: 1,
               ),
             ),
@@ -1302,13 +1306,13 @@ class _SettingsPageState extends State<SettingsPage> {
           margin: const EdgeInsets.symmetric(horizontal: 8),
           decoration: BoxDecoration(
             color: isSelected
-                ? Theme.of(context).colorScheme.primary.withOpacity(0.2)
-                : Theme.of(context).colorScheme.surface.withOpacity(0.1),
+                ? Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.2)
+                : Theme.of(context).colorScheme.surface.withValues(alpha: 255 * 0.1),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isSelected
-                  ? Theme.of(context).colorScheme.primary.withOpacity(0.3)
-                  : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                  ? Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.3)
+                  : Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.1),
               width: 1,
             ),
           ),
@@ -1321,7 +1325,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 size: 28,
                 color: isSelected
                     ? Theme.of(context).colorScheme.primary
-                    : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
               ),
               const SizedBox(height: 8),
               Text(
@@ -1329,7 +1333,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
                       color: isSelected
                           ? Theme.of(context).colorScheme.primary
-                          : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          : Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                       fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                     ),
               ),
@@ -1352,7 +1356,7 @@ class _SettingsPageState extends State<SettingsPage> {
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+            color: Theme.of(context).colorScheme.primary.withValues(alpha: 255 * 0.1),
             blurRadius: 20,
             spreadRadius: 5,
           ),
@@ -1436,7 +1440,7 @@ class _SettingsPageState extends State<SettingsPage> {
           boxShadow: isSelected
               ? [
                   BoxShadow(
-                    color: primaryColor.withOpacity(0.3),
+                    color: primaryColor.withValues(alpha: 255 * 0.3),
                     blurRadius: 15,
                     spreadRadius: 2,
                   ),
@@ -1463,13 +1467,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   Icon(
                     icon,
                     size: 28,
-                    color: isSelected ? primaryColor : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: isSelected
+                        ? primaryColor
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     title,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isSelected ? primaryColor : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: isSelected
+                              ? primaryColor
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                           fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                         ),
                   ),
@@ -1569,8 +1577,8 @@ class _SettingsPageState extends State<SettingsPage> {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   colors: [
-                    primaryColor.withOpacity(0.2),
-                    primaryColor.withOpacity(0.1),
+                    primaryColor.withValues(alpha: 255 * 0.2),
+                    primaryColor.withValues(alpha: 255 * 0.1),
                   ],
                 )
               : null,
@@ -1595,13 +1603,17 @@ class _SettingsPageState extends State<SettingsPage> {
                   Icon(
                     icon,
                     size: 28,
-                    color: isSelected ? primaryColor : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                    color: isSelected
+                        ? primaryColor
+                        : Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     title,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          color: isSelected ? primaryColor : Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                          color: isSelected
+                              ? primaryColor
+                              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                           fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
                         ),
                   ),
@@ -1627,7 +1639,7 @@ class NeonBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(0.1)
+      ..color = color.withValues(alpha: 255 * 0.1)
       ..style = PaintingStyle.fill;
 
     final path = Path()
@@ -1662,7 +1674,7 @@ class NeonGlowPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(0.1)
+      ..color = color.withValues(alpha: 255 * 0.1)
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2;
 
@@ -1688,7 +1700,7 @@ class LiquidBackgroundPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(0.1)
+      ..color = color.withValues(alpha: 255 * 0.1)
       ..style = PaintingStyle.fill;
 
     final path = Path();
@@ -1721,7 +1733,7 @@ class LiquidOptionPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = color.withOpacity(0.1)
+      ..color = color.withValues(alpha: 255 * 0.1)
       ..style = PaintingStyle.fill;
 
     final path = Path();

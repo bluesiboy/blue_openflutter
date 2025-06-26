@@ -160,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ? theme.colorScheme.onSurface.withAlpha(153)
                                   : _isPhoneValid
                                       ? theme.colorScheme.primary
-                                      : theme.colorScheme.primary.withOpacity(0.5),
+                                      : theme.colorScheme.primary.withValues(alpha: 255 * 0.5),
                               fontWeight: _isPhoneValid ? FontWeight.w600 : FontWeight.normal,
                             ),
                           ),
@@ -460,9 +460,15 @@ class _LoginPageState extends State<LoginPage> {
         onPressed: _isCodeValid || kDebugMode
             ? () async {
                 await Future.delayed(Durations.long4);
-                _btnController.success();
-                await Future.delayed(Durations.medium4);
-                if (mounted) Navigator.pushReplacementNamed(context, AppRouter.home);
+                if (_verificationCodeController.lastCode != '696969') {
+                  _btnController.error();
+                  await Future.delayed(Durations.medium4);
+                  _btnController.reset();
+                } else {
+                  _btnController.success();
+                  await Future.delayed(Durations.medium4);
+                  if (mounted) Navigator.pushReplacementNamed(context, AppRouter.home);
+                }
               }
             : null,
         child: Text(

@@ -64,7 +64,7 @@ class _AboutPageState extends State<AboutPage> {
                 Text(
                   '版本 $_version ($_buildNumber)',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                   ),
                 ),
               ],
@@ -116,7 +116,7 @@ class _AboutPageState extends State<AboutPage> {
             child: Text(
               '© 2024 Blue OpenFlutter Team',
               style: theme.textTheme.bodySmall?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.6),
+                color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
               ),
             ),
           ),
@@ -163,14 +163,14 @@ class _AboutPageState extends State<AboutPage> {
           Text(
             value,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                 ),
           ),
           if (onTap != null) ...[
             const SizedBox(width: 8),
             Icon(
               Icons.chevron_right,
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
             ),
           ],
         ],

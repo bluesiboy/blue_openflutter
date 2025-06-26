@@ -1,4 +1,5 @@
 import 'package:blue_openflutter/controls/breath_glow_widget.dart';
+import 'package:blue_openflutter/pages/chat_list_theme_page.dart';
 import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
 import 'chat_list_page.dart';
@@ -46,7 +47,7 @@ class _HomePageState extends State<HomePage> {
         NavigationDestination(
           icon: Icon(
             Icons.home_outlined,
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
           ),
           selectedIcon: Icon(
             Icons.home,
@@ -57,7 +58,7 @@ class _HomePageState extends State<HomePage> {
         NavigationDestination(
           icon: Icon(
             Icons.explore_outlined,
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
           ),
           selectedIcon: Icon(
             Icons.explore,
@@ -68,7 +69,7 @@ class _HomePageState extends State<HomePage> {
         NavigationDestination(
           icon: Icon(
             Icons.message_outlined,
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
           ),
           selectedIcon: Icon(
             Icons.message,
@@ -79,7 +80,7 @@ class _HomePageState extends State<HomePage> {
         NavigationDestination(
           icon: Icon(
             Icons.person_outline,
-            color: theme.colorScheme.onSurface.withOpacity(0.6),
+            color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
           ),
           selectedIcon: Icon(
             Icons.person,
@@ -246,7 +247,7 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
                 decoration: InputDecoration(
                   hintText: '搜索',
                   hintStyle: theme.textTheme.bodyLarge?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.5),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.5),
                   ),
                   border: InputBorder.none,
                   contentPadding: EdgeInsets.zero,
@@ -315,7 +316,7 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
       decoration: BoxDecoration(
         border: Border(
           bottom: BorderSide(
-            color: theme.colorScheme.outline.withOpacity(0.1),
+            color: theme.colorScheme.outline.withValues(alpha: 255 * 0.1),
           ),
         ),
       ),
@@ -374,7 +375,7 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
       itemCount: notifications.length,
       separatorBuilder: (context, index) => Divider(
         height: 1,
-        color: Theme.of(context).colorScheme.outline.withOpacity(0.1),
+        color: Theme.of(context).colorScheme.outline.withValues(alpha: 255 * 0.1),
       ),
       itemBuilder: (context, index) {
         final notification = notifications[index];
@@ -404,7 +405,7 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
               Text(
                 notification['time'] as String,
                 style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                     ),
               ),
             ],
@@ -414,7 +415,7 @@ class _HomeTabState extends State<_HomeTab> with SingleTickerProviderStateMixin 
             child: Text(
               notification['content'] as String,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: Theme.of(context).colorScheme.onSurface.withOpacity(0.8),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.8),
                   ),
             ),
           ),
@@ -444,7 +445,7 @@ class _MessageTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ChatListPage();
+    return const ChatListThemePage();
   }
 }
 
@@ -534,7 +535,7 @@ class _ProfileTabState extends State<_ProfileTab> {
                 Text(
                   'ID: 12345678',
                   style: theme.textTheme.bodyMedium?.copyWith(
-                    color: theme.colorScheme.onSurface.withOpacity(0.6),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -585,7 +586,7 @@ class _ProfileTabState extends State<_ProfileTab> {
               Text(
                 action['label']!,
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: theme.colorScheme.onSurface.withOpacity(0.6),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                 ),
               ),
             ],
@@ -648,13 +649,13 @@ class _ProfileTabState extends State<_ProfileTab> {
                   Text(
                     item['trailing']!,
                     style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurface.withOpacity(0.6),
+                      color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.6),
                     ),
                   ),
                 const SizedBox(width: 8),
                 Icon(
                   Icons.chevron_right,
-                  color: theme.colorScheme.onSurface.withOpacity(0.3),
+                  color: theme.colorScheme.onSurface.withValues(alpha: 255 * 0.3),
                 ),
               ],
             ),

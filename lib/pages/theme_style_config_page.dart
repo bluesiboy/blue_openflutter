@@ -108,7 +108,7 @@ class _ThemeStyleConfigPageState extends State<ThemeStyleConfigPage> {
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: Theme.of(context).dividerColor.withOpacity(0.1),
+              color: Theme.of(context).dividerColor.withValues(alpha: 255 * 0.1),
             ),
           ),
           child: child,
@@ -153,7 +153,7 @@ class _ThemeStyleConfigPageState extends State<ThemeStyleConfigPage> {
       subtitle: Text(
         subtitle,
         style: Theme.of(context).textTheme.bodySmall?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withOpacity(0.6),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 255 * 0.6),
             ),
       ),
       value: value,
