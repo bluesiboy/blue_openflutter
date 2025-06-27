@@ -160,6 +160,7 @@ Widget buildChatContentWithUnreadAnim(
             children: [
               Row(
                 children: [
+                  const SizedBox(width: 4),
                   Expanded(
                     child: Text(
                       chat.name,
@@ -173,22 +174,31 @@ Widget buildChatContentWithUnreadAnim(
                   ),
                   if (chat.isMuted)
                     Padding(
-                      padding: const EdgeInsets.only(left: 2),
+                      padding: const EdgeInsets.only(left: 6),
                       child: Icon(Icons.volume_off, size: 16, color: Colors.blueGrey.withOpacity(0.7)),
                     ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 6),
-                    child: Text(
-                      chat.time,
-                      style: TextStyle(
-                        fontSize: timeFont,
-                        color: isDark ? Colors.white38 : Colors.black38,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 350),
+                    transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+                    child: (chat.unread > 0)
+                        ? Container(
+                            key: ValueKey('${chat.unread}_${chat.isMuted}'),
+                            margin: const EdgeInsets.only(left: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                            decoration: BoxDecoration(
+                              color: chat.isMuted ? Colors.blueGrey : Colors.red,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              '${chat.unread}',
+                              style: TextStyle(color: Colors.white, fontSize: msgFont - 1, fontWeight: FontWeight.bold),
+                            ),
+                          )
+                        : const SizedBox.shrink(),
                   ),
                 ],
               ),
+              const SizedBox(height: 4),
               Row(
                 children: [
                   if (isDraft)
@@ -229,24 +239,16 @@ Widget buildChatContentWithUnreadAnim(
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 350),
-                    transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
-                    child: (chat.unread > 0)
-                        ? Container(
-                            key: ValueKey(chat.unread),
-                            margin: const EdgeInsets.only(left: 6),
-                            padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                            decoration: BoxDecoration(
-                              color: Colors.redAccent,
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Text(
-                              '${chat.unread}',
-                              style: TextStyle(color: Colors.white, fontSize: msgFont - 1, fontWeight: FontWeight.bold),
-                            ),
-                          )
-                        : const SizedBox.shrink(),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 6),
+                    child: Text(
+                      chat.time,
+                      style: TextStyle(
+                        fontSize: timeFont,
+                        color: isDark ? Colors.white38 : Colors.black38,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -772,6 +774,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
   Widget build(BuildContext context) {
     return Scaffold(
       extendBodyBehindAppBar: true,
+      extendBody: true,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -792,117 +795,120 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
                   }
                 },
               ),
-              IconButton(
-                icon: const Icon(Icons.keyboard_arrow_up),
-                tooltip: '滚动到顶部',
-                onPressed: _scrollToTop,
-              ),
-              IconButton(
-                icon: const Icon(Icons.keyboard_arrow_down),
-                tooltip: '滚动到底部',
-                onPressed: _scrollToBottom,
-              ),
-              PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert),
-                tooltip: '更多操作',
-                onSelected: (value) {
-                  switch (value) {
-                    case 'scroll_to_first':
-                      if (_chatList.isNotEmpty) {
-                        _scrollToChat(0);
-                      }
-                      break;
-                    case 'scroll_to_last':
-                      if (_chatList.isNotEmpty) {
-                        _scrollToChat(_chatList.length - 1);
-                      }
-                      break;
-                    case 'scroll_to_pinned':
-                      if (_pinnedChats.isNotEmpty) {
-                        final firstPinnedIndex = _chatList.indexOf(_pinnedChats.first);
-                        _scrollToChat(firstPinnedIndex);
-                      }
-                      break;
-                    case 'scroll_to_normal':
-                      if (_normalChats.isNotEmpty) {
-                        final firstNormalIndex = _chatList.indexOf(_normalChats.first);
-                        _scrollToChat(firstNormalIndex);
-                      }
-                      break;
-                    case 'highlight_random':
-                      if (_chatList.isNotEmpty) {
-                        final randomIndex = Random().nextInt(_chatList.length);
-                        _scrollToChatAndHighlight(randomIndex);
-                      }
-                      break;
-                    case 'scroll_with_animation':
-                      _scrollWithCustomAnimation();
-                      break;
-                  }
-                },
-                itemBuilder: (context) => [
-                  const PopupMenuItem(
-                    value: 'scroll_to_first',
-                    child: Row(
-                      children: [
-                        Icon(Icons.first_page),
-                        SizedBox(width: 8),
-                        Text('滚动到第一个'),
-                      ],
+              if (1 == 2) ...[
+                IconButton(
+                  icon: const Icon(Icons.keyboard_arrow_up),
+                  tooltip: '滚动到顶部',
+                  onPressed: _scrollToTop,
+                ),
+                IconButton(
+                  icon: const Icon(Icons.keyboard_arrow_down),
+                  tooltip: '滚动到底部',
+                  onPressed: _scrollToBottom,
+                ),
+                PopupMenuButton<String>(
+                  icon: const Icon(Icons.more_vert),
+                  tooltip: '更多操作',
+                  onSelected: (value) {
+                    switch (value) {
+                      case 'scroll_to_first':
+                        if (_chatList.isNotEmpty) {
+                          _scrollToChat(0);
+                        }
+                        break;
+                      case 'scroll_to_last':
+                        if (_chatList.isNotEmpty) {
+                          _scrollToChat(_chatList.length - 1);
+                        }
+                        break;
+                      case 'scroll_to_pinned':
+                        if (_pinnedChats.isNotEmpty) {
+                          final firstPinnedIndex = _chatList.indexOf(_pinnedChats.first);
+                          _scrollToChat(firstPinnedIndex);
+                        }
+                        break;
+                      case 'scroll_to_normal':
+                        if (_normalChats.isNotEmpty) {
+                          final firstNormalIndex = _chatList.indexOf(_normalChats.first);
+                          _scrollToChat(firstNormalIndex);
+                        }
+                        break;
+                      case 'highlight_random':
+                        if (_chatList.isNotEmpty) {
+                          final randomIndex = Random().nextInt(_chatList.length);
+                          _scrollToChatAndHighlight(randomIndex);
+                        }
+                        break;
+                      case 'scroll_with_animation':
+                        _scrollWithCustomAnimation();
+                        break;
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem(
+                      value: 'scroll_to_first',
+                      child: Row(
+                        children: [
+                          Icon(Icons.first_page),
+                          SizedBox(width: 8),
+                          Text('滚动到第一个'),
+                        ],
+                      ),
                     ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'scroll_to_last',
-                    child: Row(
-                      children: [
-                        Icon(Icons.last_page),
-                        SizedBox(width: 8),
-                        Text('滚动到最后一个'),
-                      ],
+                    const PopupMenuItem(
+                      value: 'scroll_to_last',
+                      child: Row(
+                        children: [
+                          Icon(Icons.last_page),
+                          SizedBox(width: 8),
+                          Text('滚动到最后一个'),
+                        ],
+                      ),
                     ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'scroll_to_pinned',
-                    child: Row(
-                      children: [
-                        Icon(Icons.push_pin),
-                        SizedBox(width: 8),
-                        Text('滚动到置顶'),
-                      ],
+                    const PopupMenuItem(
+                      value: 'scroll_to_pinned',
+                      child: Row(
+                        children: [
+                          Icon(Icons.push_pin),
+                          SizedBox(width: 8),
+                          Text('滚动到置顶'),
+                        ],
+                      ),
                     ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'scroll_to_normal',
-                    child: Row(
-                      children: [
-                        Icon(Icons.chat),
-                        SizedBox(width: 8),
-                        Text('滚动到聊天'),
-                      ],
+                    const PopupMenuItem(
+                      value: 'scroll_to_normal',
+                      child: Row(
+                        children: [
+                          Icon(Icons.chat),
+                          SizedBox(width: 8),
+                          Text('滚动到聊天'),
+                        ],
+                      ),
                     ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'highlight_random',
-                    child: Row(
-                      children: [
-                        Icon(Icons.flash_on),
-                        SizedBox(width: 8),
-                        Text('随机高亮'),
-                      ],
+                    const PopupMenuItem(
+                      value: 'highlight_random',
+                      child: Row(
+                        children: [
+                          Icon(Icons.flash_on),
+                          SizedBox(width: 8),
+                          Text('随机高亮'),
+                        ],
+                      ),
                     ),
-                  ),
-                  const PopupMenuItem(
-                    value: 'scroll_with_animation',
-                    child: Row(
-                      children: [
-                        Icon(Icons.animation),
-                        SizedBox(width: 8),
-                        Text('动画滚动'),
-                      ],
+                    const PopupMenuItem(
+                      value: 'scroll_with_animation',
+                      child: Row(
+                        children: [
+                          Icon(Icons.animation),
+                          SizedBox(width: 8),
+                          Text('动画滚动'),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
-              ),
+                  ],
+                ),
+              ],
+              IconButton.filledTonal(onPressed: () {}, icon: const Icon(Icons.person)),
             ],
           ),
         ],

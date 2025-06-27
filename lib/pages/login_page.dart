@@ -467,7 +467,7 @@ class _LoginPageState extends State<LoginPage> {
                 } else {
                   _btnController.success();
                   await Future.delayed(Durations.medium4);
-                  if (mounted) Navigator.pushReplacementNamed(context, AppRouter.home);
+                  if (mounted) Navigator.pushNamedAndRemoveUntil(context, AppRouter.msgList, (_) => false);
                 }
               }
             : null,
