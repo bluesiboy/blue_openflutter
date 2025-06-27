@@ -8,6 +8,7 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_slidable/flutter_slidable.dart';
 import '../models/chat_item.dart';
 import '../models/message_model.dart';
+import '../pages/profile_edit_page.dart';
 
 class ChatListLayout {
   // ===================== 常规模式参数 =====================
@@ -356,7 +357,7 @@ class _ChatListItemState extends State<ChatListItem> with TickerProviderStateMix
     final timeFont = widget.timeFont;
 
     return Slidable(
-      key: ValueKey(chat.avatar + chat.name),
+      key: ValueKey("${chat.avatar}${chat.name}_${widget.index}"),
       endActionPane: ActionPane(
         motion: const DrawerMotion(),
         extentRatio: 0.42,
@@ -908,7 +909,15 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
                   ],
                 ),
               ],
-              IconButton.filledTonal(onPressed: () {}, icon: const Icon(Icons.person)),
+              IconButton.filledTonal(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (_) => const ProfileEditPage()),
+                  );
+                },
+                icon: const Icon(Icons.person),
+              ),
             ],
           ),
         ],
