@@ -7,6 +7,8 @@ import 'dart:ui' as ui;
 import 'package:flutter/services.dart';
 import '../models/message_model.dart';
 import 'dart:ui';
+import 'package:provider/provider.dart';
+import '../providers/user_profile_provider.dart';
 
 // ===================== 详情页布局参数 =====================
 class ChatDetailLayout {
@@ -283,6 +285,9 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    // 获取当前用户头像
+    final userProfileProvider = Provider.of<UserProfileProvider>(context, listen: true);
+    final myAvatar = userProfileProvider.profile.avatar;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -294,7 +299,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
             child: Column(
               children: [
                 Expanded(
-                  child: _buildMessageList(isDark),
+                  child: _buildMessageList(isDark, myAvatar),
                 ),
                 _buildEmojiList(),
                 _buildAddList(),
@@ -450,7 +455,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
     );
   }
 
-  Widget _buildMessageList(bool isDark) {
+  Widget _buildMessageList(bool isDark, String myAvatar) {
     return AnimationLimiter(
       child: ListView.builder(
         controller: _scrollController,
@@ -464,7 +469,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
             child: SlideAnimation(
               verticalOffset: 30.0,
               child: FadeInAnimation(
-                child: _buildMessageItem(msg, index, isDark),
+                child: _buildMessageItem(msg, index, isDark, myAvatar),
               ),
             ),
           );
@@ -473,7 +478,7 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
     );
   }
 
-  Widget _buildMessageItem(Message msg, int index, bool isDark) {
+  Widget _buildMessageItem(Message msg, int index, bool isDark, String myAvatar) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: ChatDetailLayout.messageSpacing / 2),
       child: Row(
@@ -537,11 +542,24 @@ class _ChatDetailPageState extends State<ChatDetailPage> with TickerProviderStat
                 ],
               ),
               child: ClipOval(
-                child: Icon(
-                  Icons.person,
-                  size: 20,
-                  color: isDark ? Colors.white70 : Colors.blueAccent,
-                ),
+                child: myAvatar.isNotEmpty
+                    ? Image.asset(
+                        myAvatar,
+                        width: ChatDetailLayout.avatarSize,
+                        height: ChatDetailLayout.avatarSize,
+                        fit: BoxFit.cover,
+                        errorBuilder: (ctx, error, stack) => Container(
+                          width: ChatDetailLayout.avatarSize,
+                          height: ChatDetailLayout.avatarSize,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.person, color: Colors.white54, size: 20),
+                        ),
+                      )
+                    : Icon(
+                        Icons.person,
+                        size: 20,
+                        color: isDark ? Colors.white70 : Colors.blueAccent,
+                      ),
               ),
             ),
           ],

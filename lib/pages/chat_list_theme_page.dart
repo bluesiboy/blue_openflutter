@@ -9,6 +9,8 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import '../models/chat_item.dart';
 import '../models/message_model.dart';
 import '../pages/profile_edit_page.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_profile_provider.dart';
 
 class ChatListLayout {
   // ===================== 常规模式参数 =====================
@@ -1194,5 +1196,28 @@ class StaticBorderPainter extends CustomPainter {
     return oldDelegate.borderRadius != borderRadius ||
         oldDelegate.borderWidth != borderWidth ||
         oldDelegate.isDark != isDark;
+  }
+}
+
+class ChatListThemePageWrapper extends StatelessWidget {
+  const ChatListThemePageWrapper({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<UserProfileProvider>(
+      future: UserProfileProvider.load(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('加载用户信息失败'));
+        } else {
+          return ChangeNotifierProvider<UserProfileProvider>.value(
+            value: snapshot.data!,
+            child: const ChatListThemePage(),
+          );
+        }
+      },
+    );
   }
 }

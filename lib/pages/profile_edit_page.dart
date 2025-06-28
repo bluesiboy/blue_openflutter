@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import '../controls/breath_glow_widget.dart';
+import 'package:provider/provider.dart';
+import '../providers/user_profile_provider.dart';
 
 class ProfileEditPage extends StatefulWidget {
   const ProfileEditPage({Key? key}) : super(key: key);
@@ -14,8 +16,10 @@ class ProfileEditPage extends StatefulWidget {
 class _ProfileEditPageState extends State<ProfileEditPage> {
   String? _selectedAvatar;
   List<String> _avatarFiles = [];
-  final TextEditingController _nameController = TextEditingController(text: '用户名');
+  final TextEditingController _nameController = TextEditingController();
   late final BreathGlowController _breathGlowController;
+  String? _initialAvatar;
+  String? _initialName;
 
   @override
   void initState() {
@@ -25,6 +29,15 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
       duration: const Duration(seconds: 1),
       maxOpacity: 0.18,
     );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final provider = Provider.of<UserProfileProvider>(context, listen: false);
+      setState(() {
+        _initialAvatar = provider.profile.avatar.isNotEmpty ? provider.profile.avatar : null;
+        _selectedAvatar = _initialAvatar;
+        _initialName = provider.profile.name.isNotEmpty ? provider.profile.name : '';
+        _nameController.text = _initialName!;
+      });
+    });
     _loadAvatars();
   }
 
@@ -47,12 +60,19 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     super.dispose();
   }
 
-  void _onSave() {
-    // 这里可以保存到本地/服务端，当前仅返回
-    Navigator.pop(context, {
-      'avatar': _selectedAvatar,
-      'name': _nameController.text,
-    });
+  void _onSave() async {
+    final provider = Provider.of<UserProfileProvider>(context, listen: false);
+    bool changed = false;
+    if (_selectedAvatar != null && _selectedAvatar != _initialAvatar) {
+      await provider.updateAvatar(_selectedAvatar!);
+      changed = true;
+    }
+    if (_nameController.text != _initialName) {
+      await provider.updateName(_nameController.text);
+      changed = true;
+    }
+    if (changed && mounted) Navigator.pop(context);
+    if (!changed && mounted) Navigator.pop(context);
   }
 
   @override

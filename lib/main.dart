@@ -1,3 +1,4 @@
+import 'package:blue_openflutter/providers/user_profile_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
@@ -14,13 +15,12 @@ void main() async {
 
   // 加载主题样式配置
   final themeStyleConfig = await ThemeStyleConfig.load();
-
+  var userProfileProvider = await UserProfileProvider.load();
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (_) => ThemeStyleProvider(themeStyleConfig),
-        ),
+        ChangeNotifierProvider(create: (_) => ThemeStyleProvider(themeStyleConfig)),
+        ChangeNotifierProvider(create: (_) => userProfileProvider),
       ],
       child: MyApp(savedThemeMode: savedThemeMode),
     ),
