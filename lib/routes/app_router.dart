@@ -1,3 +1,4 @@
+import 'package:blue_openflutter/pages/chat_list_theme_page.dart';
 import 'package:flutter/material.dart';
 import '../pages/login_page.dart';
 import '../pages/home_page.dart';
@@ -11,6 +12,7 @@ class AppRouter {
   static const String home = '/home';
   static const String settings = '/settings';
   static const String about = '/about';
+  static const String msgList = '/msglist';
 
   static Route<dynamic> generateRoute(RouteSettings settings) {
     final name = settings.name;
@@ -28,6 +30,8 @@ class AppRouter {
       return MaterialPageRoute(builder: (_) => const SettingsPage());
     } else if (name == about) {
       return MaterialPageRoute(builder: (_) => const AboutPage());
+    } else if (name == msgList) {
+      return MaterialPageRoute(builder: (_) => const ChatListThemePage());
     } else {
       return _buildErrorRoute('没有找到路由: $name');
     }

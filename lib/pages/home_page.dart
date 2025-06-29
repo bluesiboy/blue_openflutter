@@ -2,7 +2,6 @@ import 'package:blue_openflutter/controls/breath_glow_widget.dart';
 import 'package:blue_openflutter/pages/chat_list_theme_page.dart';
 import 'package:blue_openflutter/routes/app_router.dart';
 import 'package:flutter/material.dart';
-import 'chat_list_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
