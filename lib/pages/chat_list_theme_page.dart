@@ -954,11 +954,7 @@ class _ChatListThemePageState extends State<ChatListThemePage> with SingleTicker
                         }
                       },
                       proxyDecorator: (child, index, animation) {
-                        return Material(
-                          color: Colors.transparent,
-                          elevation: 44,
-                          child: child,
-                        );
+                        return Material(color: Colors.transparent, elevation: 44, child: child);
                       },
                     ),
                   ),
