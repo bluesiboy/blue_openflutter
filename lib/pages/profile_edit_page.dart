@@ -107,9 +107,7 @@ class _ProfileEditPageState extends State<ProfileEditPage> {
     await Future.delayed(const Duration(seconds: 2));
 
     // 关闭等待对话框
-    if (mounted) {
-      Navigator.of(context).pop();
-    }
+    if (!mounted) return;
 
     // 执行原有的保存逻辑
     final provider = Provider.of<UserProfileProvider>(context, listen: false);
